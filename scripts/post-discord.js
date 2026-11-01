@@ -13,6 +13,7 @@ const STATE_FILE = join(ROOT, 'data', 'discord-state.json');
 const WEBHOOK = (process.env.DISCORD_WEBHOOK_URL || '').trim();
 const SITE_URL = process.env.SITE_URL || 'https://choo-e.github.io/wow-forever-calendar/';
 const DRY_RUN = process.env.DRY_RUN === '1';
+const LINK = `👉 [오늘도 평화로운 호드 생활 캘린더 열기](${SITE_URL})`; // 모든 알림의 맨 아랫줄
 
 const WEEK = ['일', '월', '화', '수', '목', '금', '토'];
 const readJson = async (file, fallback) => {
@@ -76,6 +77,9 @@ function buildBoard(schedule, guild, today) {
   const notices = (guild.notices || []).map((n) => (typeof n === 'string' ? n : n.text)).filter(Boolean);
   if (notices.length) fields.push({ name: '📢 공지', value: trunc(notices.map((n) => `• ${n}`).join('\n')) });
 
+  // 맨 아랫줄: 기준 날짜와 웹앱 링크 (제목 글자를 눌러도, 이 링크를 눌러도 상세 페이지로 이동)
+  fields.push({ name: '🔗 상세 일정·달력', value: `${today} 기준 (한국 시간)\n${LINK}` });
+
   const description = featured
     ? `**${featured.title}** 까지 **${dayNum(featured.date) === t ? 'D-DAY' : `D-${dayNum(featured.date) - t}`}** (${md(featured.date)})`
     : '';
@@ -89,7 +93,6 @@ function buildBoard(schedule, guild, today) {
         description,
         color: 0xe8c05a,
         fields,
-        footer: { text: `${today} 기준 · 전체 달력은 위 제목을 눌러 확인하세요 (한국 시간)` },
       },
     ],
   };
@@ -134,9 +137,10 @@ function buildPatchAlert(items) {
   const shown = items.slice(0, MAX_PATCH_LINES);
   const lines = shown.map((i) => `• [${i.title}](${i.url}) — ${i.sourceName}`);
   if (items.length > shown.length) lines.push(`…외 ${items.length - shown.length}건은 사이트에서 확인하세요`);
+  lines.push('', LINK);
   return {
     allowed_mentions: { parse: [] },
-    embeds: [{ title: '🛠️ 새 패치·핫픽스 소식', description: lines.join('\n'), color: 0x4f86d6, url: SITE_URL, footer: { text: '출처의 제목·링크만 보여줍니다. 제목을 눌러 원문을 확인하세요.' } }],
+    embeds: [{ title: '🛠️ 새 패치·핫픽스 소식', description: lines.join('\n'), color: 0x4f86d6, url: SITE_URL }],
   };
 }
 
@@ -161,7 +165,7 @@ if (newEvents.length) {
   const lines = newEvents.map((e) => `• **${span(e)}** ${e.time ? `${e.time} ` : ''}${e.title}${e.note ? ` (${e.note})` : ''}`);
   await call('POST', WEBHOOK, {
     allowed_mentions: { parse: [] },
-    content: `📢 **새 길드 일정이 등록되었습니다**\n${lines.join('\n')}\n${SITE_URL}`,
+    content: `📢 **새 길드 일정이 등록되었습니다**\n${lines.join('\n')}\n\n${LINK}`,
   });
   console.log(`새 일정 알림 ${newEvents.length}건 전송`);
 }

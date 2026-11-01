@@ -1,0 +1,14 @@
+{
+  "name": "wow-forever-calendar",
+  "version": "1.0.0",
+  "description": "WoW Forever 일정·패치·이벤트 모음 웹앱",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "build:data": "node scripts/build-data.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

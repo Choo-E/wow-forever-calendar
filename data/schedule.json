@@ -1,0 +1,64 @@
+[
+  {
+    "id": "forever-beta",
+    "title": "포에버 베타 테스트",
+    "date": "2026-09-17",
+    "endDate": "2026-10-22",
+    "note": "종료된 일정 (미국 기준)",
+    "category": "beta",
+    "url": "https://news.blizzard.com/ko-kr/world-of-warcraft"
+  },
+  {
+    "id": "forever-name-reservation",
+    "title": "사전 이름 예약 (캐릭터 사전 생성)",
+    "date": "2026-10-28",
+    "endDate": "2026-11-04",
+    "note": "사전 구매자 대상 · 최대 캐릭터 3개 · 한국 10/28 오전 7시 시작 (미국 10/27~11/3)",
+    "category": "prelaunch",
+    "url": "https://news.blizzard.com/ko-kr/article/24303866"
+  },
+  {
+    "id": "forever-launch",
+    "title": "월드 오브 워크래프트: 포에버 전 세계 출시",
+    "date": "2026-11-05",
+    "note": "미국 기준 11월 4일 오후 3시(PST) · 한국 기준 11월 5일 오전 8시",
+    "category": "launch",
+    "featured": true,
+    "url": "https://news.blizzard.com/ko-kr/article/24315820"
+  },
+  {
+    "id": "forever-raids",
+    "title": "공격대 3곳 오픈: 지하 심굴 · 하이잘 정상 · 오닉시아의 둥지",
+    "date": "2026-12-10",
+    "note": "60레벨 대상 · 미국 기준 12월 9일 (지하 심굴 10인 / 하이잘 정상 20인 / 오닉시아의 둥지 40인)",
+    "category": "raid",
+    "url": "https://news.blizzard.com/ko-kr/article/24315820"
+  },
+  {
+    "id": "forever-hardcore",
+    "title": "하드코어 규칙 추가",
+    "date": null,
+    "dateText": "2026년 겨울 (정확한 날짜 미정)",
+    "note": "출시 후 추가 예정",
+    "category": "roadmap",
+    "url": "https://news.blizzard.com/ko-kr/article/24315820"
+  },
+  {
+    "id": "forever-spring-update",
+    "title": "첫 번째 대규모 콘텐츠 업데이트",
+    "date": null,
+    "dateText": "2027년 봄 (날짜 미정)",
+    "note": "BlizzCon 로드맵 기준",
+    "category": "roadmap",
+    "url": "https://www.warcrafttavern.com/forever/news/world-of-warcraft-forever-roadmap-beta-launch-date-raids/"
+  },
+  {
+    "id": "forever-summer-update",
+    "title": "두 번째 대규모 콘텐츠 업데이트",
+    "date": null,
+    "dateText": "2027년 여름 (날짜 미정)",
+    "note": "BlizzCon 로드맵 기준",
+    "category": "roadmap",
+    "url": "https://www.warcrafttavern.com/forever/news/world-of-warcraft-forever-roadmap-beta-launch-date-raids/"
+  }
+]

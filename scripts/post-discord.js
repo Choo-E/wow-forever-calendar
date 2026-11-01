@@ -135,7 +135,7 @@ const MAX_PATCH_LINES = 5;
 
 function buildPatchAlert(items) {
   const shown = items.slice(0, MAX_PATCH_LINES);
-  const lines = shown.map((i) => `• [${i.title}](${i.url}) — ${i.sourceName}`);
+  const lines = shown.map((i) => `• [${i.titleKo || i.title}](${i.url}) — ${i.sourceName}`);
   if (items.length > shown.length) lines.push(`…외 ${items.length - shown.length}건은 사이트에서 확인하세요`);
   lines.push('', LINK);
   return {

@@ -378,6 +378,10 @@ function renderFeed() {
 }
 
 function card(i) {
+  // 한글 번역이 있으면 그것을 먼저 보여주고, 원문 제목은 작게 남긴다
+  const translated = Boolean(i.titleKo);
+  const title = i.titleKo || i.title;
+  const summary = i.summaryKo || i.summary;
   const img = i.image
     ? `<div class="thumb" style="background-image:url('${esc(i.image)}')" role="img" aria-label=""></div>`
     : '';
@@ -387,11 +391,12 @@ function card(i) {
       <div class="meta">
         ${i.forever ? '<span class="badge forever">FOREVER</span>' : ''}
         <span class="badge ${i.category}">${CAT_LABEL[i.category] || '소식'}</span>
-        <span>${esc(i.sourceName)}${i.lang === 'en' ? ' · EN' : ''}</span>
+        <span>${esc(i.sourceName)}${translated ? ' · 자동 번역' : i.lang === 'en' ? ' · EN' : ''}</span>
         <span>· ${ago(i.date)}</span>
       </div>
-      <h3>${esc(i.title)}</h3>
-      ${i.summary ? `<p>${esc(i.summary)}</p>` : ''}
+      <h3>${esc(title)}</h3>
+      ${translated ? `<p class="orig" lang="en" title="${esc(i.title)}">원문: ${esc(i.title)}</p>` : ''}
+      ${summary ? `<p>${esc(summary)}</p>` : ''}
     </div>
   </a>`;
 }

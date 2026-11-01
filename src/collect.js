@@ -1,5 +1,6 @@
 import { fetchBlizzard } from './sources/blizzard.js';
 import { fetchWowhead } from './sources/wowhead.js';
+import { translateText } from './translate.js';
 
 // 공개 사이트에는 RSS로 공개된 출처만 쓴다.
 // 블리자드 뉴스 페이지 자동 수집은 약관 문제가 있을 수 있어 기본으로 꺼 두고,
@@ -12,6 +13,49 @@ export const SOURCES = [
 ];
 
 const MAX_ITEMS = 300;
+const MAX_TRANSLATE_PER_RUN = 30; // 한 번에 번역하는 글 수 (나머지는 다음 실행에서)
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// 영어 글의 제목·요약을 한국어로 번역해서 titleKo / summaryKo 로 붙인다.
+// 이미 번역한 글(원문이 그대로인 글)은 다시 번역하지 않고, 실패하면 영어 원문 그대로 둔다.
+async function addTranslations(items) {
+  let budget = MAX_TRANSLATE_PER_RUN;
+  let failures = 0;
+  let done = 0;
+  for (const i of items) {
+    if (i.lang !== 'en') continue;
+    const needTitle = i.titleSrc !== i.title;
+    const needSummary = Boolean(i.summary) && i.summarySrc !== i.summary;
+    if (!needTitle && !needSummary) continue;
+    if (budget-- <= 0) break;
+    if (failures >= 3) {
+      console.warn('번역이 연속으로 실패해서 이번 실행에서는 중단합니다.');
+      break;
+    }
+
+    let ok = false;
+    if (needTitle) {
+      const ko = await translateText(i.title);
+      if (ko) {
+        i.titleKo = ko;
+        i.titleSrc = i.title;
+        ok = true;
+      }
+    }
+    if (needSummary) {
+      const ko = await translateText(i.summary.slice(0, 400));
+      if (ko) {
+        i.summaryKo = ko;
+        i.summarySrc = i.summary;
+        ok = true;
+      }
+    }
+    failures = ok ? 0 : failures + 1;
+    if (ok) done++;
+    await sleep(300);
+  }
+  if (done) console.log(`번역 ${done}건 완료`);
+}
 
 // 이전 상태에 새로 받은 기사를 합쳐서 새 상태를 돌려준다.
 // 일부 출처가 실패해도 이전에 받아둔 기사는 그대로 유지한다.
@@ -27,7 +71,8 @@ export async function collect(prev = {}) {
   results.forEach((r, idx) => {
     const s = SOURCES[idx];
     if (r.status === 'fulfilled') {
-      r.value.forEach((item) => byId.set(item.id, item));
+      // 새로 받은 글 위에, 이전에 저장해 둔 번역(titleKo 등)을 유지한다
+      r.value.forEach((item) => byId.set(item.id, { ...byId.get(item.id), ...item }));
       sources[s.id] = { name: s.name, ok: true, count: r.value.length, fetchedAt: now };
       console.log(`[${now}] ${s.name}: ${r.value.length}건`);
     } else {
@@ -38,5 +83,6 @@ export async function collect(prev = {}) {
   });
 
   const items = [...byId.values()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAX_ITEMS);
+  await addTranslations(items);
   return { updatedAt: now, sources, items };
 }

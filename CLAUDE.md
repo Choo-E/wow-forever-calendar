@@ -24,6 +24,12 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - 달력에는 청록색(`cat-guild`)으로 표시, 달력 아래 "길드 일정" 영역에 예정·진행 중과 접이식 "지난 일정"으로 자동 분류됨
 - 공개 사이트이므로 멤버 이름, 디스코드 초대 링크 등 민감한 정보는 넣지 않는다
 
+## 자동 번역
+- `src/translate.js` — 영어→한국어 무료 번역 (1순위 Google 번역 비공식 주소, 2순위 MyMemory). API 키 없음. `GLOSSARY`에 와우 용어 보정 사전
+- `src/collect.js`의 `addTranslations` — 새 글만 번역해 `titleKo`/`summaryKo`로 저장 (원문 `titleSrc`/`summarySrc`와 비교해 바뀐 글만 재번역). 한 번에 30건, 연속 3회 실패하면 중단. 실패하면 영어 원문을 그대로 보여줌
+- 화면은 한글을 먼저, 원문 제목은 작게 표시 (`.orig`). 비공식 주소라 막힐 수 있으며, 그때는 `translateText` 함수만 Claude API 등으로 교체하면 됨
+- 어색한 용어는 `GLOSSARY`에 항목을 추가해 고친다
+
 ## 디스코드 일정판
 - `scripts/post-discord.js` — 웹훅으로 채널에 일정판 메시지를 올리고, 일정이 바뀌면 같은 메시지를 수정. 새 길드 일정(id 기준)이 생기면 알림 메시지도 올림
 - 웹훅 주소는 **GitHub Secrets의 `DISCORD_WEBHOOK_URL`** 에만 둔다. 파일·대화·커밋에 절대 적지 않는다 (저장소가 공개)

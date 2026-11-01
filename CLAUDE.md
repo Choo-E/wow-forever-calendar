@@ -29,6 +29,8 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - 웹훅 주소는 **GitHub Secrets의 `DISCORD_WEBHOOK_URL`** 에만 둔다. 파일·대화·커밋에 절대 적지 않는다 (저장소가 공개)
 - `data/discord-state.json` — 일정판 메시지 ID와 내용 해시, 이미 알린 일정 id (봇이 자동 커밋)
 - 새 길드 일정에는 반드시 고유한 `id`를 붙인다 (알림 중복 방지용)
+- 새 패치·핫픽스 소식도 같은 채널에 알림 (`isPatchAlert`: 사이트 분류가 patch이고 제목에 hotfix/patch notes/tuning/fix/PTR 등이 있고 interview/guide/datamine 등은 제외). 한 번에 최대 5건, 처음 실행 때는 기존 글을 알리지 않고 기록만 함 (`seenItems`)
+- 알림 기준이 어긋나면 `PATCH_ALERT_INCLUDE` / `PATCH_ALERT_EXCLUDE` 정규식을 고친다
 - 시험: `DRY_RUN=1 node scripts/post-discord.js` (전송 없이 내용만 출력)
 
 ## 규칙

@@ -118,14 +118,44 @@ const ids = (guild.events || []).map((e) => e.id).filter(Boolean);
 const firstRun = state.seen === null;
 const newEvents = firstRun ? [] : (guild.events || []).filter((e) => e.id && !state.seen.includes(e.id));
 
+// 새 패치·핫픽스 소식 알림 (feed.json 은 같은 워크플로에서 바로 앞 단계가 만든다)
+// 처음 실행할 때는 이미 있는 글을 "본 것"으로만 기록하고 알리지 않는다.
+const feed = await readJson(join(ROOT, 'public', 'data', 'feed.json'), { items: [] });
+const feedIds = (feed.items || []).map((i) => i.id);
+const seenItems = state.seenItems || null;
+// 알림은 사이트 분류(patch)보다 더 엄격하게: 진짜 패치·핫픽스·조정 소식만. 인터뷰·영상·데이터마이닝 글은 뺀다.
+const PATCH_ALERT_INCLUDE = /hotfix|핫픽스|patch notes|패치 ?노트|\btuning\b|\bfix(ed|es)\b|\bptr\b/i;
+const PATCH_ALERT_EXCLUDE = /interview|playthrough|podcast|guide|discovered|datamin|cadence|preview|recap/i;
+const isPatchAlert = (i) => i.category === 'patch' && PATCH_ALERT_INCLUDE.test(i.title) && !PATCH_ALERT_EXCLUDE.test(i.title);
+const newPatches = seenItems ? (feed.items || []).filter((i) => isPatchAlert(i) && !seenItems.includes(i.id)) : [];
+const MAX_PATCH_LINES = 5;
+
+function buildPatchAlert(items) {
+  const shown = items.slice(0, MAX_PATCH_LINES);
+  const lines = shown.map((i) => `• [${i.title}](${i.url}) — ${i.sourceName}`);
+  if (items.length > shown.length) lines.push(`…외 ${items.length - shown.length}건은 사이트에서 확인하세요`);
+  return {
+    allowed_mentions: { parse: [] },
+    embeds: [{ title: '🛠️ 새 패치·핫픽스 소식', description: lines.join('\n'), color: 0x4f86d6, url: SITE_URL, footer: { text: '출처의 제목·링크만 보여줍니다. 제목을 눌러 원문을 확인하세요.' } }],
+  };
+}
+
 if (DRY_RUN || !WEBHOOK) {
   if (!DRY_RUN) console.log('DISCORD_WEBHOOK_URL 이 없어 디스코드 전송을 건너뜁니다.');
   console.log(JSON.stringify(board, null, 2));
   if (newEvents.length) console.log('새 일정 알림 대상:', newEvents.map((e) => e.title).join(', '));
+  const sample = seenItems ? newPatches : (feed.items || []).filter(isPatchAlert);
+  console.log(`패치 알림 대상(${seenItems ? '신규' : '첫 실행이면 알리지 않고 기록만 함 — 아래는 현재 패치로 분류되는 글'}): ${sample.length}건`);
+  sample.slice(0, 8).forEach((i) => console.log(` - ${i.date.slice(0, 10)} ${i.title}`));
   process.exit(0);
 }
 
-const next = { ...state, seen: ids };
+const next = { ...state, seen: ids, seenItems: feedIds };
+
+if (newPatches.length) {
+  await call('POST', WEBHOOK, buildPatchAlert(newPatches));
+  console.log(`새 패치·핫픽스 알림 ${newPatches.length}건 전송`);
+}
 
 if (newEvents.length) {
   const lines = newEvents.map((e) => `• **${span(e)}** ${e.time ? `${e.time} ` : ''}${e.title}${e.note ? ` (${e.note})` : ''}`);

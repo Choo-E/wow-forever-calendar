@@ -8,6 +8,7 @@ import { collect } from '../src/collect.js';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'public', 'data', 'feed.json');
 const SCHEDULE = join(ROOT, 'data', 'schedule.json');
+const GUILD = join(ROOT, 'data', 'guild.json');
 
 const readJson = async (file, fallback) => {
   try {
@@ -20,6 +21,7 @@ const readJson = async (file, fallback) => {
 const prev = await readJson(OUT, {});
 const state = await collect(prev);
 const schedule = await readJson(SCHEDULE, []);
+const guild = await readJson(GUILD, { name: '', notices: [], events: [] });
 
 const allFailed = Object.values(state.sources).every((s) => !s.ok);
 if (allFailed && !state.items.length) {
@@ -28,5 +30,5 @@ if (allFailed && !state.items.length) {
 }
 
 await mkdir(dirname(OUT), { recursive: true });
-await writeFile(OUT, JSON.stringify({ ...state, schedule }));
+await writeFile(OUT, JSON.stringify({ ...state, schedule, guild }));
 console.log(`저장 완료: ${state.items.length}건 → public/data/feed.json`);

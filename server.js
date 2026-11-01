@@ -9,6 +9,7 @@ const ROOT = fileURLToPath(new URL('.', import.meta.url));
 const PUBLIC = join(ROOT, 'public');
 const CACHE_FILE = join(ROOT, 'data', 'cache.json');
 const SCHEDULE_FILE = join(ROOT, 'data', 'schedule.json');
+const GUILD_FILE = join(ROOT, 'data', 'guild.json');
 const PORT = Number(process.env.PORT) || 3000;
 const REFRESH_MS = 15 * 60 * 1000;
 
@@ -35,11 +36,11 @@ function refresh() {
   return refreshing;
 }
 
-async function readSchedule() {
+async function readJson(file, fallback) {
   try {
-    return JSON.parse(await readFile(SCHEDULE_FILE, 'utf8'));
+    return JSON.parse(await readFile(file, 'utf8'));
   } catch {
-    return [];
+    return fallback;
   }
 }
 
@@ -59,7 +60,9 @@ const server = http.createServer(async (req, res) => {
   // 공개 사이트의 정적 파일(public/data/feed.json)과 같은 주소로 응답한다.
   if (url.pathname === '/data/feed.json') {
     res.writeHead(200, { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' });
-    res.end(JSON.stringify({ ...state, schedule: await readSchedule() }));
+    const schedule = await readJson(SCHEDULE_FILE, []);
+    const guild = await readJson(GUILD_FILE, { name: '', notices: [], events: [] });
+    res.end(JSON.stringify({ ...state, schedule, guild }));
     return;
   }
 

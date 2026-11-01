@@ -220,6 +220,35 @@ a.event-card:hover { transform: translateY(-2px); border-color: var(--gold); }
   .cal-title { font-size: 20px; }
 }
 
+/* ───── 길드 일정 ───── */
+.cat-guild { --c: #2fa8a0; --ct: #fff; }
+.guild-list { display: grid; gap: 12px; }
+.guild-notices { margin: 0 0 16px; padding: 14px 18px 14px 36px; background: #2a2210; border: 1px solid var(--gold-dim); border-radius: var(--radius); color: var(--gold-hi); }
+.guild-item {
+  display: flex; align-items: center; gap: 18px; padding: 16px 20px;
+  background: linear-gradient(90deg, rgba(47, 168, 160, .14), transparent 55%), var(--panel);
+  border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: var(--radius);
+}
+.guild-item .event-date { min-width: 84px; }
+.guild-item .event-date .d { color: #8fe3dc; font-size: 34px; white-space: nowrap; }
+.guild-info { flex: 1; min-width: 0; }
+.guild-info h3 { margin: 0 0 4px; font-family: var(--serif); font-size: 20px; }
+.guild-info p { margin: 0; color: var(--ink-dim); font-size: 14px; }
+.guild-status { font: 700 14px var(--sans); padding: 4px 14px; border-radius: 999px; background: var(--c); color: var(--ct); white-space: nowrap; }
+.guild-item.soon .guild-status { background: transparent; color: #8fe3dc; border: 1px solid var(--c); }
+.guild-item.live { box-shadow: 0 0 20px rgba(47, 168, 160, .3); border-color: var(--c); }
+.guild-item.past { opacity: .75; }
+.guild-item.past .guild-status { background: #3a3a34; color: #c9c3b0; }
+.guild-item.past .event-date .d { color: var(--ink-dim); }
+.guild-past { margin-top: 16px; }
+.guild-past summary { cursor: pointer; color: var(--gold); font-weight: 700; padding: 8px 4px; list-style-position: inside; }
+.guild-past summary:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
+.guild-past .guild-list { margin-top: 10px; }
+@media (max-width: 680px) {
+  .guild-item { flex-wrap: wrap; gap: 10px 14px; padding: 14px; }
+  .guild-info h3 { font-size: 18px; }
+}
+
 /* ───── 로고 ───── */
 .brand { align-items: center; }
 .brand-logo { height: 76px; width: auto; display: block; filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .6)); }

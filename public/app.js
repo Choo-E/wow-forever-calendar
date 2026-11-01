@@ -14,7 +14,7 @@ const CAT_LABEL = { patch: '패치·핫픽스', event: '이벤트', news: '소�
 const WEEK = ['일', '월', '화', '수', '목', '금', '토'];
 
 const filter = { cat: 'all', src: 'all', day: null };
-let data = { items: [], schedule: [], sources: {}, updatedAt: null };
+let data = { items: [], schedule: [], guild: { name: '', notices: [], events: [] }, sources: {}, updatedAt: null };
 let calMonth = null; // { y, m }
 
 const $ = (id) => document.getElementById(id);
@@ -167,7 +167,8 @@ function renderCalendar() {
 
   // 날짜별 주요 일정. 기간이 있으면 시작(▶)·중간(막대)·끝(◀ 종료)으로 나눠 매일 표시한다.
   const marks = new Map();
-  for (const s of data.schedule) {
+  const guildEvents = (data.guild?.events || []).map((e) => ({ ...e, category: 'guild' }));
+  for (const s of [...data.schedule, ...guildEvents]) {
     if (!s.date) continue;
     const start = dayNum(s.date);
     const end = s.endDate ? dayNum(s.endDate) : start;
@@ -231,6 +232,7 @@ function renderCalendar() {
       <span><i class="cmark cat-launch">주요 일정</i></span>
       <span><i class="cmark cat-prelaunch range-first">기간 일정 ▶</i></span>
       <span><i class="cmark cat-raid">공격대</i></span>
+      ${data.guild?.events?.length ? '<span><i class="cmark cat-guild">길드 일정</i></span>' : ''}
     </div>`;
 }
 
@@ -253,6 +255,74 @@ $('calendar').addEventListener('click', (e) => {
   renderFeed();
   if (filter.day) $('timeline').scrollIntoView({ behavior: 'smooth' });
 });
+
+// ───── 길드 일정 (예정·진행 중 / 지난 일정) ─────
+function guildItem(e, today) {
+  const start = dayNum(e.date);
+  const end = dayNum(e.endDate || e.date);
+  const sp = parts(e.date);
+  const ep = parts(e.endDate || e.date);
+  const days = end - start + 1;
+  const multi = days > 1;
+
+  let status;
+  let cls;
+  if (end < today) {
+    status = '종료';
+    cls = 'past';
+  } else if (start <= today) {
+    status = multi ? `진행 중 · ${today - start + 1}/${days}일째` : '오늘';
+    cls = 'live';
+  } else {
+    status = `D-${start - today}`;
+    cls = 'soon';
+  }
+
+  const dateBox = `<span class="m">${sp.m}월</span><span class="d">${multi ? `${sp.d}–${ep.m === sp.m ? ep.d : `${ep.m}/${ep.d}`}` : sp.d}</span><span class="m">${multi ? `${days}일간` : `${sp.w}요일`}</span>`;
+  const range = multi
+    ? `${sp.m}월 ${sp.d}일(${sp.w}) ~ ${ep.m}월 ${ep.d}일(${ep.w})`
+    : `${sp.m}월 ${sp.d}일(${sp.w})${e.time ? ` ${esc(e.time)}` : ''}`;
+  return `<div class="guild-item cat-guild ${cls}">
+    <div class="event-date">${dateBox}</div>
+    <div class="guild-info">
+      <h3>${esc(e.title)}</h3>
+      <p>${range}${e.note ? ` · ${esc(e.note)}` : ''}</p>
+    </div>
+    <span class="guild-status">${status}</span>
+  </div>`;
+}
+
+function renderGuild() {
+  const g = data.guild || {};
+  const events = g.events || [];
+  const notices = g.notices || [];
+  const section = $('guildSection');
+  if (!events.length && !notices.length) {
+    section.hidden = true;
+    return;
+  }
+  section.hidden = false;
+  $('guildTitle').textContent = g.name ? `${g.name} · 길드 일정` : '길드 일정';
+
+  $('guildNotices').innerHTML = notices.length
+    ? `<ul class="guild-notices">${notices.map((n) => `<li>${esc(typeof n === 'string' ? n : n.text)}</li>`).join('')}</ul>`
+    : '';
+
+  const today = dayNum(kstDay(Date.now()));
+  const sortedAsc = [...events].sort((a, b) => dayNum(a.date) - dayNum(b.date));
+  const upcoming = sortedAsc.filter((e) => dayNum(e.endDate || e.date) >= today);
+  const past = sortedAsc.filter((e) => dayNum(e.endDate || e.date) < today).reverse();
+
+  $('guildUpcoming').innerHTML = upcoming.length
+    ? upcoming.map((e) => guildItem(e, today)).join('')
+    : '<div class="empty">예정된 길드 일정이 없습니다.</div>';
+
+  const pastBox = $('guildPast');
+  pastBox.hidden = !past.length;
+  $('guildPastCount').textContent = `(${past.length}건)`;
+  $('guildPastList').innerHTML = past.map((e) => guildItem(e, today)).join('');
+  pastBox.open = !upcoming.length && past.length > 0;
+}
 
 // ───── 타임라인 ─────
 function renderFeed() {
@@ -342,6 +412,7 @@ function renderAll() {
   renderLive();
   renderUpcoming();
   renderCalendar();
+  renderGuild();
   renderFilters();
   renderFeed();
   renderStatus();

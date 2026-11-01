@@ -1,0 +1,14 @@
+{
+  "name": "오늘도 평화로운 호드 생활",
+  "faction": "호드",
+  "notices": [],
+  "events": [
+    {
+      "id": "guild-launch-week",
+      "title": "길마 연차, 풀 렙업",
+      "date": "2026-11-05",
+      "endDate": "2026-11-08",
+      "note": "포에버 출시 주간"
+    }
+  ]
+}

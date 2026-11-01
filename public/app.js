@@ -389,7 +389,7 @@ function card(i) {
     ${img}
     <div class="card-body">
       <div class="meta">
-        ${i.forever ? '<span class="badge forever">FOREVER</span>' : ''}
+        ${i.scope === 'all' ? '<span class="badge common" title="포에버를 포함한 모든 와우에 해당하는 소식">와우 공통</span>' : i.forever ? '<span class="badge forever">FOREVER</span>' : ''}
         <span class="badge ${i.category}">${CAT_LABEL[i.category] || '소식'}</span>
         <span>${esc(i.sourceName)}${translated ? ' · 자동 번역' : i.lang === 'en' ? ' · EN' : ''}</span>
         <span>· ${ago(i.date)}</span>

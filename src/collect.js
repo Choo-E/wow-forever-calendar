@@ -13,6 +13,10 @@ export const SOURCES = [
 ];
 
 const MAX_ITEMS = 300;
+
+// 포에버 소식과 모든 와우에 공통인 소식만 남기고, 본섭(Live)·본섭 테스트(PTR) 등은 버린다.
+// scope 가 없는 옛 데이터는 Forever 언급이 있을 때만 남긴다.
+const isRelevant = (i) => i.scope === 'forever' || i.scope === 'all' || (i.scope === undefined && i.forever);
 const MAX_TRANSLATE_PER_RUN = 30; // 한 번에 번역하는 글 수 (나머지는 다음 실행에서)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -64,7 +68,7 @@ export async function collect(prev = {}) {
   const enabled = new Set(SOURCES.map((s) => s.id));
   const results = await Promise.allSettled(SOURCES.map((s) => s.run()));
 
-  const byId = new Map((prev.items || []).filter((i) => enabled.has(i.source)).map((i) => [i.id, i]));
+  const byId = new Map((prev.items || []).filter((i) => enabled.has(i.source) && isRelevant(i)).map((i) => [i.id, i]));
   const sources = {};
   for (const id of enabled) if (prev.sources?.[id]) sources[id] = prev.sources[id];
 
@@ -72,7 +76,10 @@ export async function collect(prev = {}) {
     const s = SOURCES[idx];
     if (r.status === 'fulfilled') {
       // 새로 받은 글 위에, 이전에 저장해 둔 번역(titleKo 등)을 유지한다
-      r.value.forEach((item) => byId.set(item.id, { ...byId.get(item.id), ...item }));
+      r.value.forEach((item) => {
+        if (isRelevant(item)) byId.set(item.id, { ...byId.get(item.id), ...item });
+        else byId.delete(item.id); // 예전에는 포에버였다가 분류가 바뀐 글 등
+      });
       sources[s.id] = { name: s.name, ok: true, count: r.value.length, fetchedAt: now };
       console.log(`[${now}] ${s.name}: ${r.value.length}건`);
     } else {

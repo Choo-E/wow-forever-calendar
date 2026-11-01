@@ -161,6 +161,7 @@ a.event-card:hover { transform: translateY(-2px); border-color: var(--gold); }
 .badge.event { color: #8fe0a0; border-color: #35633c; background: rgba(111, 191, 115, .12); }
 .badge.news { color: var(--ink-dim); border-color: var(--line); }
 .badge.forever { color: #1b1608; background: var(--gold); border-color: var(--gold); }
+.badge.common { color: #d9c9ff; border-color: #6b5aa6; background: rgba(139, 127, 184, .18); }
 .card h3 { margin: 0 0 4px; font-family: var(--serif); font-size: 17px; line-height: 1.4; }
 .card p { margin: 0; color: var(--ink-dim); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 

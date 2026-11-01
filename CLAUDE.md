@@ -24,6 +24,12 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - 달력에는 청록색(`cat-guild`)으로 표시, 달력 아래 "길드 일정" 영역에 예정·진행 중과 접이식 "지난 일정"으로 자동 분류됨
 - 공개 사이트이므로 멤버 이름, 디스코드 초대 링크 등 민감한 정보는 넣지 않는다
 
+## 소식 거르기 (포에버만)
+- Wowhead RSS는 기사마다 `<category>` 꼬리표(Forever / Live=본섭 / PTR=본섭 테스트 / WoW=전체 공통)를 붙인다. `wowhead.js`가 이를 `scope`(forever · all · retail · other)로 바꾸고, `collect.js`의 `isRelevant`가 **forever와 all만** 남긴다
+- 본섭(Live)·PTR·그 외 클래식 등은 저장하지 않으며, 이전에 저장된 글도 다음 실행에서 정리됨
+- `scope === 'all'`(모든 와우 공통)은 화면에 보라색 "와우 공통" 배지로 표시
+- 꼬리표가 없는 글은 제목·요약에 Forever가 있을 때만 포에버로 취급
+
 ## 자동 번역
 - `src/translate.js` — 영어→한국어 무료 번역 (1순위 Google 번역 비공식 주소, 2순위 MyMemory). API 키 없음. `GLOSSARY`에 와우 용어 보정 사전
 - `src/collect.js`의 `addTranslations` — 새 글만 번역해 `titleKo`/`summaryKo`로 저장 (원문 `titleSrc`/`summarySrc`와 비교해 바뀐 글만 재번역). 한 번에 30건, 연속 3회 실패하면 중단. 실패하면 영어 원문을 그대로 보여줌

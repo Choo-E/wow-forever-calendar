@@ -24,6 +24,15 @@ export async function fetchWowhead() {
     const image = (block.match(/<media:content[^>]*url="([^"]+)"/) || [])[1] || '';
     const guid = tag(block, 'guid').match(/(\d+)\s*$/)?.[1] || link;
 
+    // Wowhead가 기사마다 붙이는 버전 꼬리표: Forever / Live(본섭) / PTR(본섭 테스트) / WoW(전체 공통) 등
+    const cats = [...block.matchAll(/<category[^>]*>([\s\S]*?)<\/category>/g)].map((c) => decode(c[1]).trim().toLowerCase());
+    const cls = classify(title, summary);
+    let scope = 'other'; // forever(포에버) | all(모든 와우 공통) | retail(본섭) | other(그 외 클래식 등)
+    if (cats.includes('forever')) scope = 'forever';
+    else if (cats.includes('live') || cats.includes('ptr')) scope = 'retail';
+    else if (cats.includes('wow')) scope = 'all';
+    else if (!cats.length && cls.forever) scope = 'forever'; // 꼬리표가 없으면 제목·요약에 Forever가 있는지로 판단
+
     items.push({
       id: `wowhead-${guid}`,
       source: 'wowhead',
@@ -34,7 +43,9 @@ export async function fetchWowhead() {
       url: link,
       image,
       date: new Date(pub).toISOString(),
-      ...classify(title, summary),
+      scope,
+      ...cls,
+      forever: cls.forever || scope === 'forever',
     });
   }
   return items;

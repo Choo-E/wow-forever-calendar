@@ -148,6 +148,34 @@ function renderFilters() {
 // ───── 월간 달력 ─────
 const ymdOf = (n) => new Date(n * 86400000).toISOString().slice(0, 10);
 
+// 매년 반복 일정(repeat: 'yearly')을 연도별 실제 날짜로 펼친다.
+// date 의 연도부터 lastYear 까지 만들고, since(창립 연도)가 있으면 제목에 "N주년"을 붙인다.
+function expandYearly(events, lastYear) {
+  const out = [];
+  for (const e of events) {
+    if (e.repeat !== 'yearly') {
+      out.push(e);
+      continue;
+    }
+    const [by, bm, bd] = e.date.split('-');
+    const length = e.endDate ? dayNum(e.endDate) - dayNum(e.date) : 0;
+    for (let y = Number(by); y <= lastYear; y++) {
+      const date = `${y}-${bm}-${bd}`;
+      if (ymdOf(dayNum(date)) !== date) continue; // 2월 29일처럼 그 해에 없는 날짜는 건너뜀
+      const years = e.since ? y - Number(e.since) : 0;
+      out.push({
+        ...e,
+        id: `${e.id}-${y}`,
+        date,
+        endDate: length ? ymdOf(dayNum(date) + length) : undefined,
+        title: years > 0 ? `${e.title} (${years}주년)` : e.title,
+        repeat: undefined,
+      });
+    }
+  }
+  return out;
+}
+
 function renderCalendar() {
   const today = kstDay(Date.now());
   if (!calMonth) {
@@ -167,7 +195,8 @@ function renderCalendar() {
 
   // 날짜별 주요 일정. 기간이 있으면 시작(▶)·중간(막대)·끝(◀ 종료)으로 나눠 매일 표시한다.
   const marks = new Map();
-  const guildEvents = (data.guild?.events || []).map((e) => ({ ...e, category: 'guild' }));
+  const thisYear = Number(today.slice(0, 4));
+  const guildEvents = expandYearly(data.guild?.events || [], Math.max(y, thisYear + 1)).map((e) => ({ ...e, category: 'guild' }));
   for (const s of [...data.schedule, ...guildEvents]) {
     if (!s.date) continue;
     const start = dayNum(s.date);
@@ -294,7 +323,7 @@ function guildItem(e, today) {
 
 function renderGuild() {
   const g = data.guild || {};
-  const events = g.events || [];
+  const events = expandYearly(g.events || [], Number(kstDay(Date.now()).slice(0, 4)) + 1);
   const notices = g.notices || [];
   const section = $('guildSection');
   if (!events.length && !notices.length) {

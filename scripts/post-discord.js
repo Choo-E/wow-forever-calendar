@@ -33,6 +33,29 @@ const md = (ymd) => {
 };
 const span = (e) => (e.endDate && e.endDate !== e.date ? `${md(e.date)}~${md(e.endDate)}` : md(e.date));
 const trunc = (s, n = 1000) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+const ymdOf = (n) => new Date(n * 86400000).toISOString().slice(0, 10);
+
+// 매년 반복 일정(repeat: 'yearly')을 연도별 실제 날짜로 펼친다. (public/app.js 의 expandYearly 와 같은 규칙)
+function expandYearly(events, lastYear) {
+  const out = [];
+  for (const e of events) {
+    if (e.repeat !== 'yearly') {
+      out.push(e);
+      continue;
+    }
+    const [by, bm, bd] = e.date.split('-');
+    const length = e.endDate ? dayNum(e.endDate) - dayNum(e.date) : 0;
+    for (let y = Number(by); y <= lastYear; y++) {
+      const date = `${y}-${bm}-${bd}`;
+      if (ymdOf(dayNum(date)) !== date) continue;
+      const years = e.since ? y - Number(e.since) : 0;
+      out.push({ ...e, id: `${e.id}-${y}`, date, endDate: length ? ymdOf(dayNum(date) + length) : undefined, title: years > 0 ? `${e.title} (${years}주년)` : e.title, repeat: undefined });
+    }
+  }
+  return out;
+}
+// 새 일정 알림용 날짜 문구: 매년 반복이면 "매년 11/5", 아니면 일반 날짜
+const when = (e) => (e.repeat === 'yearly' ? `매년 ${Number(e.date.split('-')[1])}/${Number(e.date.split('-')[2])}` : span(e));
 
 // ───── 메시지 만들기 ─────
 function buildBoard(schedule, guild, today) {
@@ -49,7 +72,9 @@ function buildBoard(schedule, guild, today) {
   const live = dated.filter((s) => s.endDate && dayNum(s.date) <= t && t <= endOf(s));
   const upcoming = dated.filter((s) => dayNum(s.date) > t || (!s.endDate && dayNum(s.date) === t)).sort((a, b) => dayNum(a.date) - dayNum(b.date));
   const undated = schedule.filter((s) => !s.date);
-  const guildEvents = (guild.events || []).filter((e) => endOf(e) >= t).sort((a, b) => dayNum(a.date) - dayNum(b.date));
+  const guildEvents = expandYearly(guild.events || [], Number(today.slice(0, 4)) + 1)
+    .filter((e) => endOf(e) >= t)
+    .sort((a, b) => dayNum(a.date) - dayNum(b.date));
 
   const featured = schedule.find((s) => s.featured && s.date && dayNum(s.date) >= t) || upcoming[0];
   const fields = [];
@@ -162,7 +187,7 @@ if (newPatches.length) {
 }
 
 if (newEvents.length) {
-  const lines = newEvents.map((e) => `• **${span(e)}** ${e.time ? `${e.time} ` : ''}${e.title}${e.note ? ` (${e.note})` : ''}`);
+  const lines = newEvents.map((e) => `• **${when(e)}** ${e.time ? `${e.time} ` : ''}${e.title}${e.note ? ` (${e.note})` : ''}`);
   await call('POST', WEBHOOK, {
     allowed_mentions: { parse: [] },
     content: `📢 **새 길드 일정이 등록되었습니다**\n${lines.join('\n')}\n\n${LINK}`,

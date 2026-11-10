@@ -9,6 +9,12 @@
       "date": "2026-11-05",
       "endDate": "2026-11-08",
       "note": "포에버 출시 주간"
+    },
+    {
+      "id": "guild-anniversary",
+      "title": "길드 창립 기념일",
+      "date": "2026-11-05",
+      "repeat": "yearly"
     }
   ]
 }

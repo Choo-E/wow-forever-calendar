@@ -95,3 +95,16 @@ Supabase 프로젝트의 **Project Settings → API** (또는 상단 **Connect**
 - **가입은 승인제**다. 아무나 디스코드로 로그인할 수는 있지만 승인 전에는 아무 정보도 볼 수 없다.
 
 참고: [Supabase 프로젝트 일시 정지 안내](https://supabase.com/docs/guides/platform/free-plan-pausing), [Supabase 디스코드 로그인 설정](https://supabase.com/docs/guides/auth/social-login/auth-discord)
+
+---
+
+## 진행 기록 (2026-11-11)
+
+- 완료: Supabase 프로젝트 `mstnhofzainznwbexfbn`, 디스코드 개발자 앱, 디스코드 로그인 연결, `schema.sql` 실행, 이메일 가입 끄기, URL 설정, **첫 로그인과 길마 지정**.
+- 보안 점검(비로그인 상태): 프로필·캐릭터·공지 읽기 빈 목록, 캐릭터 임의 등록·등급 변경·설정 변경·프로필 수정/삭제 모두 차단됨 확인.
+
+### 겪은 문제와 해결 (다음에 참고)
+- **로그인 실패 `Unable to exchange external code`**: Supabase에 저장된 **Client Secret이 잘못된 값**이었다. 앱 내장 브라우저에서는 디스코드의 복사 버튼이 클립보드에 넣지 못해, 이전에 복사해 둔 다른 글이 붙여넣어졌다.
+- **진단 방법**: 값을 읽지 않고 **글자 수와 글자 종류만** 확인한다. 정상 시크릿은 32자, 영문+숫자(+`_` `-`)이고 공백·한글이 없다.
+- **해결**: 시크릿 글자를 **더블클릭으로 선택한 뒤 Ctrl+C**로 복사해 붙여넣고, **저장 전에** 위 방법으로 확인했다.
+- 새 시크릿을 만들 때마다 이전 시크릿은 무효가 된다. 마지막으로 만든 값이 Supabase에 들어 있어야 한다.

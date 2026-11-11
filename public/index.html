@@ -151,22 +151,20 @@
         <h2 class="block-title"><span>내 계정</span></h2>
         <div id="accountCard"></div>
       </section>
+      <section class="block" id="myCharsBlock" hidden>
+        <h2 class="block-title"><span>내 캐릭터</span></h2>
+        <div id="myChars"></div>
+      </section>
+      <section class="block" id="adminBlock" hidden>
+        <h2 class="block-title"><span>가입 승인 · 등급 관리 (호드평화유지단)</span></h2>
+        <div id="adminPanel"></div>
+      </section>
       <section class="block">
         <h2 class="block-title"><span>길드원 명단</span></h2>
+        <div id="rosterSwitch"></div>
+        <div id="roster"></div>
+        <p class="roster-note">명단에는 <b>캐릭터 이름 · 직업 · 역할 · 등급</b>만 보입니다. 디스코드 계정 같은 정보는 공개되지 않습니다.</p>
       </section>
-      <div class="placeholder">
-        <div class="ph-icon">👥</div>
-        <h3>멤버 명단은 준비 중입니다</h3>
-        <p>길드원이 직접 캐릭터를 등록하면 명단이 만들어집니다. 명단에는 <b>캐릭터 이름 · 직업 · 역할 · 등급</b>만 보이고, 디스코드 계정 같은 정보는 공개되지 않습니다.</p>
-        <p>처음에는 모두에게 공개하고, 나중에 <b>"길드원만 보기"</b>로 바꿀 수 있게 만들 예정입니다.</p>
-        <span class="ph-tag">준비 중 · 로그인 도입 후 열림</span>
-      </div>
-      <div class="table-wrap" aria-hidden="true">
-        <table class="ph-table">
-          <thead><tr><th>캐릭터</th><th>직업</th><th>역할</th><th>등급</th></tr></thead>
-          <tbody><tr><td colspan="4">아직 등록된 멤버가 없습니다</td></tr></tbody>
-        </table>
-      </div>
     </section>
 
     <!-- 회의록 -->
@@ -227,5 +225,6 @@
   <script src="config.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
+  <script src="members.js"></script>
 </body>
 </html>

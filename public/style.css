@@ -419,3 +419,65 @@ a.live-card:hover { border-color: var(--gold-hi); }
 .rank-badge.r-master, .rank-badge.r-officer { background: var(--horde); color: #fff; }
 .placeholder.ok { border-style: solid; border-color: var(--green); }
 .placeholder .btn { margin-top: 14px; }
+
+/* ═════════ 멤버 탭: 캐릭터 · 승인 · 명단 ═════════ */
+.sub-title { margin: 22px 0 10px; font-family: var(--serif); font-size: 18px; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+.sub-title:first-child { margin-top: 0; }
+.count { display: inline-block; min-width: 24px; text-align: center; padding: 0 8px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--gold-dim); color: var(--gold-hi); font: 700 13px var(--sans); }
+.hint, .roster-note { color: var(--ink-dim); font-size: 13px; margin: 10px 2px 0; }
+.btn.small { padding: 4px 12px; font-size: 13px; }
+.btn.danger { border-color: #8a3a31; color: #f0a99f; }
+.btn.danger:hover:not(:disabled) { border-color: #e0685b; color: #ffd0ca; }
+.star { color: var(--gold); }
+
+.role-tag { white-space: nowrap; font-size: 13px; }
+.role-summary { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 12px; color: var(--ink-dim); }
+.role-summary b { color: var(--gold-hi); }
+.roster-table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.roster-table th, .roster-table td { padding: 10px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+.roster-table th { color: var(--gold); font-weight: 700; background: rgba(232, 192, 90, .06); white-space: nowrap; }
+.roster-table tr:last-child td { border-bottom: 0; }
+
+.switch-row { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 12px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+.switch-row input { width: 18px; height: 18px; accent-color: var(--gold); }
+.switch-row small { color: var(--ink-dim); }
+
+/* 내 캐릭터 */
+.char-list { display: grid; gap: 8px; margin-bottom: 14px; }
+.char-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.char-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.char-info span { color: var(--ink-dim); }
+.char-actions { display: flex; gap: 8px; }
+.char-form { padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.char-form h3 { margin: 0 0 10px; font-family: var(--serif); color: var(--gold); font-size: 17px; }
+.char-form h3 small { color: var(--ink-dim); font-family: var(--sans); }
+.form-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.form-row label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-dim); }
+.form-row input, .form-row select { min-width: 150px; padding: 8px 10px; background: var(--bg-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+.form-row input:focus, .form-row select:focus { outline: 2px solid var(--gold-hi); outline-offset: 1px; }
+
+/* 가입 승인 */
+.admin-list { display: grid; gap: 10px; }
+.admin-card { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr auto; gap: 12px; align-items: center; padding: 12px 16px; background: linear-gradient(90deg, rgba(232, 192, 90, .08), transparent 50%), var(--panel); border: 1px solid var(--gold-dim); border-radius: var(--radius); }
+.admin-who { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.admin-who small { color: var(--ink-dim); }
+.admin-chars { color: var(--ink); font-size: 14px; }
+.admin-chars small { color: var(--ink-dim); }
+.admin-act { display: flex; gap: 8px; align-items: center; }
+.admin-act select, .admin-table select { padding: 5px 8px; background: var(--bg-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--gold-dim); object-fit: cover; }
+.avatar.ph { display: inline-block; background: var(--panel-2); }
+
+/* 알림창 */
+#toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); z-index: 200; max-width: min(92vw, 520px); padding: 12px 20px; border-radius: 10px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; box-shadow: 0 8px 24px rgba(0, 0, 0, .5); }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+#toast.ok { background: #16301d; border: 1px solid var(--green); color: #cdf5d1; }
+#toast.err { background: #3a1511; border: 1px solid var(--horde); color: #ffd0ca; }
+
+@media (max-width: 680px) {
+  #toast { bottom: calc(86px + env(safe-area-inset-bottom)); }
+  .admin-card { grid-template-columns: 1fr; }
+  .form-row input, .form-row select { min-width: 0; width: 100%; }
+  .form-row label { flex: 1 1 140px; }
+  .roster-table th, .roster-table td { padding: 8px 10px; }
+}

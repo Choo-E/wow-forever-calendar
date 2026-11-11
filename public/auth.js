@@ -36,8 +36,15 @@
 
   const safeAvatar = (u) => (typeof u === 'string' && u.startsWith('https://cdn.discordapp.com/') ? u : '');
 
+  // 다른 화면 코드(members.js 등)가 로그인 상태를 알 수 있게 알려 준다
+  function emit(detail) {
+    window.hlAuthState = detail;
+    window.dispatchEvent(new CustomEvent('hl-auth', { detail }));
+  }
+
   async function render(session) {
     if (!session) {
+      emit({ session: null, userId: null, rank: null, name: '' });
       box.innerHTML = '<button class="btn login-btn" type="button" id="loginBtn">🔑 디스코드로 로그인</button>';
       box.querySelector('#loginBtn').onclick = login;
       card.innerHTML = `<div class="placeholder">
@@ -60,6 +67,7 @@
     const avatar = safeAvatar(me?.avatar_url);
     box.innerHTML = `<span class="me">${avatar ? `<img src="${esc(avatar)}" alt="" width="26" height="26">` : ''}<b>${esc(name)}</b><span class="rank-badge r-${esc(rank)}">${esc(RANK[rank] || rank)}</span></span><button class="btn" type="button" id="logoutBtn">로그아웃</button>`;
     box.querySelector('#logoutBtn').onclick = logout;
+    emit({ session, userId: session.user.id, rank, name });
 
     let body;
     if (rank === 'pending') {

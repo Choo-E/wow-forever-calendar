@@ -100,6 +100,8 @@ begin
   if not public.is_member() then
     return;
   end if;
+  -- 여러 명이 동시에 화면을 열어도 레이드 생성은 한 번에 한 요청씩 처리한다 (서로 엉키는 교착 방지)
+  perform pg_advisory_xact_lock(hashtext('ensure_raids'));
   for t in select * from public.raid_templates where active loop
     for d in select g::date from generate_series(today_kst, today_kst + 13, interval '1 day') g loop
       if extract(dow from d)::int = t.weekday then

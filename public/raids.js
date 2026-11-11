@@ -45,7 +45,25 @@
   };
 
   // ───── 불러오기 ─────
-  async function load() {
+  // 같은 요청이 겹쳐 나가지 않게 한 번에 하나만 실행하고, 실행 중에 새 요청이 오면 끝난 뒤 한 번 더 한다.
+  let running = null;
+  let again = false;
+  function load() {
+    if (running) {
+      again = true;
+      return running;
+    }
+    running = doLoad().finally(() => {
+      running = null;
+      if (again) {
+        again = false;
+        load();
+      }
+    });
+    return running;
+  }
+
+  async function doLoad() {
     syncBanner();
     $('raidSignupBlock').hidden = !isMember();
     $('raidAdminBlock').hidden = !isOfficer();

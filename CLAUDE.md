@@ -57,3 +57,13 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - 기사 본문은 복사하지 않고 제목·요약·링크만 보여준다 (저작권)
 - 블리자드 페이지 구조가 바뀌면 `blizzard.js`가 먼저 깨진다. 실패해도 이전 캐시를 유지하는 것이 정상 동작
 - 실행: `node server.js` (http://localhost:3000)
+
+## 배포 시 주의 (캐시)
+- GitHub Pages는 파일을 브라우저에 최대 10분 보관한다. 화면 파일(`style.css`, `app.js`, `auth.js`, `members.js`, `config.js`)을 고쳤으면 `public/index.html`의 `?v=` 값을 **반드시 새 값으로 올린다.** 안 올리면 한동안 옛 파일과 새 파일이 섞여 동작이 깨질 수 있다
+- 서비스 워커(`public/sw.js`)를 고치면 `CACHE` 이름의 번호도 올린다
+
+## 로그인·멤버 (2단계)
+- `public/config.js`: Supabase 공개용 주소·키만 둔다. secret/service_role 키, DB 비밀번호, Discord Client Secret은 절대 두지 않는다
+- `public/auth.js`: 디스코드 로그인, 헤더 로그인 버튼, 내 계정 카드. 로그인 상태가 바뀌면 `hl-auth` 이벤트와 `window.hlAuthState`로 알림
+- `public/members.js`: 내 캐릭터 등록·삭제, 가입 승인·등급 관리(간부·길마), 공개 명단(`get_roster` 함수), 명단 공개 스위치(길마). 권한은 화면이 아니라 DB 규칙(RLS)이 최종으로 지킨다
+- 데이터베이스 설계는 `supabase/schema.sql`. 바꿨으면 Supabase SQL Editor에서 다시 실행해야 반영된다

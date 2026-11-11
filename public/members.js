@@ -40,6 +40,8 @@
     toastTimer = setTimeout(() => (t.className = ok ? 'ok' : 'err'), 4500);
   }
 
+  window.hlToast = toast; // 다른 화면 코드(raids.js)도 같은 알림창을 쓴다
+
   // 데이터베이스 오류를 알아보기 쉬운 한국어로 바꾼다
   function friendly(error) {
     const m = (error && error.message) || String(error);

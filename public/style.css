@@ -481,3 +481,51 @@ a.live-card:hover { border-color: var(--gold-hi); }
   .form-row label { flex: 1 1 140px; }
   .roster-table th, .roster-table td { padding: 8px 10px; }
 }
+
+/* ═════════ 레이드 신청 ═════════ */
+.muted { color: var(--ink-dim); }
+.signup-live #raidList .btn[disabled] { display: none; }
+#raidSignup { display: grid; gap: 14px; }
+.raid-card { padding: 16px 20px; background: linear-gradient(90deg, rgba(196, 71, 58, .14), transparent 55%), var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--horde); border-radius: var(--radius); }
+.raid-head { display: flex; gap: 18px; align-items: center; }
+.raid-head .event-date { min-width: 84px; }
+.raid-head .event-date .d { color: #ffb3a8; font-size: 36px; }
+.raid-main { flex: 1; min-width: 0; }
+.raid-main h3 { margin: 0 0 2px; font-family: var(--serif); font-size: 20px; }
+.raid-main h3 small { font: 500 14px var(--sans); color: var(--gold-hi); margin-left: 6px; }
+.raid-meta { margin: 0 0 8px; color: var(--ink-dim); font-size: 14px; }
+.manager-tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--horde); color: #fff; font: 700 11px var(--sans); vertical-align: middle; }
+.slots { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot { padding: 3px 12px; border-radius: 999px; background: var(--bg-2); border: 1px solid var(--line); font-size: 14px; font-weight: 500; }
+.slot.full { border-color: var(--horde); color: #ffb3a8; }
+.slot.wait { border-color: var(--gold-dim); color: var(--gold-hi); }
+.raid-act { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.signup-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.signup-form select, .raid-edit input, .raid-edit select { padding: 7px 10px; background: var(--bg-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+.my-status { padding: 4px 14px; border-radius: 999px; background: #16301d; border: 1px solid var(--green); color: #cdf5d1; }
+.my-status.st-waitlist { background: #2a2210; border-color: var(--gold-dim); color: var(--gold-hi); }
+.my-status.st-declined { background: #3a1511; border-color: var(--horde); color: #ffd0ca; }
+.raid-list { margin-top: 12px; }
+.raid-list summary { cursor: pointer; color: var(--gold); font-weight: 700; padding: 6px 2px; }
+.raid-list .list-body { margin-top: 8px; }
+.st-badge { padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--panel-2); border: 1px solid var(--line); white-space: nowrap; }
+.st-badge.st-confirmed { background: #16301d; border-color: var(--green); color: #cdf5d1; }
+.st-badge.st-waitlist { background: #2a2210; border-color: var(--gold-dim); color: var(--gold-hi); }
+.st-badge.st-declined { background: #3a1511; border-color: var(--horde); color: #ffd0ca; }
+.me-row td { background: rgba(232, 192, 90, .07); }
+.row-act { display: flex; flex-wrap: wrap; gap: 6px; }
+.raid-edit { margin: 0 0 14px; padding: 12px 14px; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); }
+.raid-edit h4 { margin: 0 0 8px; font-family: var(--serif); color: var(--gold); }
+.raid-edit h4 small { color: var(--ink-dim); font-family: var(--sans); font-weight: 400; }
+.raid-edit .form-row { margin-bottom: 8px; }
+.raid-edit .form-row:last-child { margin-bottom: 0; }
+.raid-edit input[type="number"] { width: 110px; min-width: 0; }
+.raid-edit input[type="text"] { min-width: 150px; }
+.tpl { background: var(--panel); }
+@media (max-width: 680px) {
+  .raid-head { align-items: flex-start; gap: 12px; }
+  .raid-head .event-date { min-width: 64px; }
+  .raid-head .event-date .d { font-size: 30px; }
+  .raid-main h3 { font-size: 18px; }
+  .signup-form select { flex: 1 1 140px; min-width: 0; }
+}

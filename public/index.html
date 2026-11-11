@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Noto+Serif+KR:wght@500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261111f">
+  <link rel="stylesheet" href="style.css?v=20261111g">
 </head>
 <body>
   <header class="top">
@@ -54,6 +54,7 @@
   <main>
     <!-- 홈 -->
     <section class="panel" data-panel="home">
+      <div id="homeDbNotices"></div>
       <div id="homeNotices"></div>
       <section id="hero" class="hero" aria-live="polite"></section>
       <section id="live" class="live" aria-live="polite"></section>
@@ -69,18 +70,34 @@
 
     <!-- 공지 -->
     <section class="panel" data-panel="notice" hidden>
-      <header class="page-head"><h1>공지</h1><p>길드 소식과 안내를 모아 봅니다.</p></header>
-      <section class="block">
-        <h2 class="block-title"><span>전체 공개 공지</span></h2>
-        <div id="noticeList"></div>
+      <header class="page-head"><h1>공지</h1><p>길드 소식과 안내를 모아 봅니다. 로그인한 등급에 따라 보이는 공지가 다릅니다.</p></header>
+      <section class="block" id="noticeComposerBlock" hidden>
+        <h2 class="block-title"><span>공지 작성 (간부 · 길마)</span></h2>
+        <form id="noticeForm" class="char-form" autocomplete="off">
+          <div class="form-row">
+            <label class="grow">제목<input type="text" name="ntitle" maxlength="100" required></label>
+            <label>공개 범위<select name="naud"><option value="public">전체 공개</option><option value="member">길드원 전용</option><option value="peacekeeper">호드평화유지단 전용</option></select></label>
+            <label>게시 종료일 <small>(선택)</small><input type="date" name="nend"></label>
+          </div>
+          <label class="block-label">내용<textarea name="nbody" rows="4" maxlength="3000" required></textarea></label>
+          <div class="form-row"><label class="chk"><input type="checkbox" name="npin"> 상단 고정 (홈 화면 맨 위에도 표시)</label><button class="btn" type="submit">공지 올리기</button></div>
+          <p class="hint">⚠️ <b>전체 공개</b> 공지는 로그인하지 않은 누구나 볼 수 있습니다. 멤버 이름·연락처 등은 쓰지 마세요.</p>
+        </form>
+      </section>
+      <section class="block" id="dbNoticesBlock">
+        <h2 class="block-title"><span>공지 목록</span></h2>
+        <div id="dbNotices"></div>
       </section>
       <section class="block">
+        <h2 class="block-title"><span>사이트 안내</span></h2>
+        <div id="noticeList"></div>
+      </section>
+      <section class="block" id="lockedNoticeBlock">
         <h2 class="block-title"><span>길드원 · 호드평화유지단 전용</span></h2>
         <div class="placeholder">
           <div class="ph-icon">🔒</div>
           <h3>로그인 후 볼 수 있는 공지</h3>
-          <p>길드원 전용 공지와 호드평화유지단(길드 관리자) 전용 공지는 <b>디스코드 로그인</b>이 도입된 뒤에 열립니다.</p>
-          <span class="ph-tag">준비 중</span>
+          <p>길드원 전용 공지와 호드평화유지단(길드 관리자) 전용 공지는 <b>디스코드로 로그인하고 승인</b>을 받으면 이 목록에 함께 나타납니다.</p>
         </div>
       </section>
     </section>
@@ -132,6 +149,14 @@
           </ul>
         </div>
       </section>
+      <section class="block" id="pastRaidsBlock" hidden>
+        <h2 class="block-title"><span>지난 레이드 · 결과와 출석</span></h2>
+        <div id="pastRaids"></div>
+      </section>
+      <section class="block" id="statsBlock" hidden>
+        <h2 class="block-title"><span>출석 통계 (간부 · 길마)</span></h2>
+        <div id="attStats"></div>
+      </section>
       <section class="block" id="raidAdminBlock" hidden>
         <h2 class="block-title"><span>정기 레이드 설정 (간부 · 길마)</span></h2>
         <div id="raidAdmin"></div>
@@ -178,19 +203,21 @@
     <!-- 회의록 -->
     <section class="panel" data-panel="minutes" hidden>
       <header class="page-head"><h1>회의록</h1><p>호드평화유지단(길드 관리자) 전용 공간입니다.</p></header>
-      <div class="placeholder lock">
-        <div class="ph-icon">🔒</div>
-        <h3>호드평화유지단 전용</h3>
-        <p><b>호드평화유지 N차 정기 총회</b> 같은 회의록은 호드평화유지단으로 로그인한 사람만 볼 수 있습니다. 로그인 기능이 도입되기 전까지는 열리지 않습니다.</p>
-        <p class="warn">이 화면에는 어떤 회의 내용도 저장되거나 표시되지 않습니다. 회의록은 공개 사이트에 올리지 않고, 로그인과 권한 확인이 있는 별도의 저장소에만 보관할 예정입니다.</p>
-        <span class="ph-tag">준비 중</span>
-      </div>
-      <section class="block">
-        <h2 class="block-title"><span>회의록에 담을 내용 (예정)</span></h2>
-        <div class="chips-static">
-          <span>회의 이름 · 차수</span><span>일시 · 장소</span><span>참석 · 불참</span><span>주요 안건</span><span>결정 사항</span><span>후속 조치(담당·기한)</span><span>다음 회의 일정</span><span>길드원 공개 요약</span>
+      <div id="minutesApp" hidden></div>
+      <div id="minutesLocked">
+        <div class="placeholder lock">
+          <div class="ph-icon">🔒</div>
+          <h3>호드평화유지단 전용</h3>
+          <p><b>호드평화유지 N차 정기 총회</b> 같은 회의록은 <b>호드평화유지단(간부·길마)으로 로그인한 사람만</b> 볼 수 있습니다.</p>
+          <p class="warn">회의록은 공개 사이트에 올라가지 않습니다. 로그인과 권한 확인이 있는 데이터베이스에만 저장되고, 권한이 없는 사람에게는 내용이 전달되지 않습니다.</p>
         </div>
-      </section>
+        <section class="block">
+          <h2 class="block-title"><span>회의록에 담기는 내용</span></h2>
+          <div class="chips-static">
+            <span>회의 이름 · 차수</span><span>일시 · 장소 · 서기</span><span>참석 · 불참</span><span>주요 안건</span><span>결정 사항</span><span>후속 조치(담당·기한)</span><span>다음 회의 일정</span><span>길드원 공개 요약</span><span>회의록 이미지</span>
+          </div>
+        </section>
+      </div>
     </section>
 
     <!-- 소식 -->
@@ -230,10 +257,13 @@
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.js"></script>
-  <script src="config.js?v=20261111f"></script>
-  <script src="app.js?v=20261111f"></script>
-  <script src="auth.js?v=20261111f"></script>
-  <script src="members.js?v=20261111f"></script>
-  <script src="raids.js?v=20261111f"></script>
+  <script src="config.js?v=20261111g"></script>
+  <script src="app.js?v=20261111g"></script>
+  <script src="auth.js?v=20261111g"></script>
+  <script src="members.js?v=20261111g"></script>
+  <script src="raids.js?v=20261111g"></script>
+  <script src="notices.js?v=20261111g"></script>
+  <script src="minutes.js?v=20261111g"></script>
+  <script src="records.js?v=20261111g"></script>
 </body>
 </html>

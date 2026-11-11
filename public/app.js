@@ -576,9 +576,8 @@ function renderHomeCards() {
 function renderNotices() {
   const notices = (data.guild?.notices || []).map((n) => (typeof n === 'string' ? { text: n } : n)).filter((n) => n.text);
   $('homeNotices').innerHTML = notices.slice(0, 3).map((n) => `<a class="notice-banner" href="#/notice">📢 ${esc(n.text)}</a>`).join('');
-  $('noticeList').innerHTML = notices.length
-    ? `<ul class="guild-notices">${notices.map((n) => `<li>${esc(n.text)}</li>`).join('')}</ul>`
-    : '<div class="empty">지금 올라온 공개 공지가 없습니다.</div>';
+  $('noticeList').innerHTML = notices.length ? `<ul class="guild-notices">${notices.map((n) => `<li>${esc(n.text)}</li>`).join('')}</ul>` : '';
+  $('noticeList').closest('.block').hidden = !notices.length; // 사이트 파일에 적은 안내가 없으면 이 영역은 숨긴다
 }
 
 function renderBrand() {

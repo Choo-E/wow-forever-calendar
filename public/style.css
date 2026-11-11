@@ -529,3 +529,59 @@ a.live-card:hover { border-color: var(--gold-hi); }
   .raid-main h3 { font-size: 18px; }
   .signup-form select { flex: 1 1 140px; min-width: 0; }
 }
+
+/* ═════════ 공지 · 회의록 · 지난 레이드 ═════════ */
+#dbNotices { display: grid; gap: 12px; }
+.notice-card { padding: 16px 20px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: var(--radius); }
+.notice-card.aud-member { border-left-color: var(--ally); }
+.notice-card.aud-peacekeeper { border-left-color: var(--horde); }
+.notice-card.expired { opacity: .6; }
+.notice-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.notice-top small { color: var(--ink-dim); margin-left: auto; }
+.aud-badge { padding: 1px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink-dim); }
+.aud-badge.aud-public { border-color: var(--gold-dim); color: var(--gold-hi); }
+.aud-badge.aud-member { border-color: #36507d; color: #8fb8ff; }
+.aud-badge.aud-peacekeeper { border-color: #8a3a31; color: #ffb3a8; }
+.notice-card h3 { margin: 0 0 6px; font-family: var(--serif); font-size: 19px; }
+.notice-body { color: var(--ink); line-height: 1.7; word-break: break-word; }
+.notice-body a { color: var(--gold-hi); }
+.notice-act { display: flex; gap: 8px; margin-top: 12px; }
+.block-label { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 13px; color: var(--ink-dim); }
+.block-label textarea, .m-form textarea, .m-form input[type="text"], .m-form input[type="number"], .m-form input[type="date"], .m-form input[type="datetime-local"], .char-form textarea, .att-form textarea, .char-form input[type="date"] {
+  padding: 8px 10px; background: var(--bg-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; font: inherit; width: 100%;
+}
+.att-form select, .stats-bar select, .m-form select, .char-form select { padding: 6px 10px; background: var(--bg-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+.form-row .grow { flex: 1 1 220px; }
+.form-row label.chk, .m-row label.chk { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); font-size: 14px; }
+.form-row label.chk input { min-width: 0; width: 18px; height: 18px; accent-color: var(--gold); }
+
+/* 회의록 */
+.minutes-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.minutes-bar .hint { margin: 0; }
+.m-form { padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.m-row { display: grid; gap: 8px; margin-bottom: 12px; padding: 12px 14px; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); }
+.m-row label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-dim); }
+.m-row-head { display: flex; justify-content: space-between; align-items: center; color: var(--gold); }
+.action-row { grid-template-columns: 1fr; }
+@media (min-width: 681px) { .action-row { grid-template-columns: minmax(200px, 1fr) 140px 160px auto auto; align-items: end; } }
+.m-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-top: 16px; }
+.m-actions.publish { padding-top: 14px; border-top: 1px dashed var(--line); }
+.m-actions label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-dim); }
+.rev { margin-top: 14px; color: var(--ink-dim); }
+.rev summary { cursor: pointer; color: var(--gold); font-weight: 700; }
+
+/* 이미지 미리보기 */
+.img-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0, 0, 0, .8); display: grid; place-items: center; padding: 16px; }
+.img-box { width: min(1120px, 100%); max-height: 94vh; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--gold-dim); border-radius: 12px; overflow: hidden; }
+.img-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.img-scroll { overflow: auto; padding: 12px; background: #050507; }
+.img-scroll img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+
+/* 지난 레이드 */
+.raid-card.past { border-left-color: var(--gold-dim); background: var(--panel); }
+.raid-card.past .event-date .d { color: var(--gold-hi); }
+.result { margin: 10px 0 0; color: var(--ink); }
+.result b { color: var(--gold); margin-right: 6px; }
+.att-form .form-row { margin: 12px 0; }
+.warn-cell { color: #ffb3a8; font-weight: 700; }
+.stats-bar { margin-bottom: 10px; }

@@ -407,3 +407,15 @@ a.live-card:hover { border-color: var(--gold-hi); }
   .more-sheet a { padding: 14px 16px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: 16px; }
   .more-sheet a[aria-current="page"] { background: #3a2f14; color: var(--gold-hi); }
 }
+
+/* ═════════ 로그인 · 내 계정 ═════════ */
+.auth-box { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.auth-box .me { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.auth-box .me img { border-radius: 50%; border: 1px solid var(--gold-dim); }
+.login-btn { background: linear-gradient(180deg, #5865f2, #3c46b8); border-color: #7983f5; color: #fff; }
+.login-btn:hover:not(:disabled) { color: #fff; border-color: #fff; }
+.rank-badge { padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--gold); color: #1b1608; }
+.rank-badge.r-pending { background: #6e6144; color: #f3e7c3; }
+.rank-badge.r-master, .rank-badge.r-officer { background: var(--horde); color: #fff; }
+.placeholder.ok { border-style: solid; border-color: var(--green); }
+.placeholder .btn { margin-top: 14px; }

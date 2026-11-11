@@ -26,6 +26,7 @@
     </div>
     <div class="status">
       <span id="updated" class="updated">불러오는 중…</span>
+      <span id="authBox" class="auth-box"></span>
       <button id="installBtn" class="btn" type="button" hidden>📲 앱으로 설치</button>
       <button id="refresh" class="btn" type="button">지금 새로고침</button>
     </div>
@@ -145,7 +146,14 @@
 
     <!-- 멤버 -->
     <section class="panel" data-panel="member" hidden>
-      <header class="page-head"><h1>멤버</h1><p>길드원 명단입니다.</p></header>
+      <header class="page-head"><h1>멤버</h1><p>내 계정과 길드원 명단입니다.</p></header>
+      <section class="block">
+        <h2 class="block-title"><span>내 계정</span></h2>
+        <div id="accountCard"></div>
+      </section>
+      <section class="block">
+        <h2 class="block-title"><span>길드원 명단</span></h2>
+      </section>
       <div class="placeholder">
         <div class="ph-icon">👥</div>
         <h3>멤버 명단은 준비 중입니다</h3>
@@ -215,6 +223,9 @@
     <button type="button" id="moreBtn" aria-expanded="false" aria-controls="moreSheet"><span class="ic">☰</span>더보기</button>
   </nav>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
   <script src="app.js"></script>
+  <script src="auth.js"></script>
 </body>
 </html>

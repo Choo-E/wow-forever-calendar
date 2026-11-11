@@ -73,9 +73,9 @@
     if (rank === 'pending') {
       body = `<h3>가입 승인을 기다리는 중입니다</h3><p><b>${esc(name)}</b>님의 가입 신청이 접수되었습니다. 길마나 간부가 승인하면 길드원 기능을 쓸 수 있습니다. 승인이 늦어지면 디스코드에서 길마·간부에게 알려 주세요.</p>`;
     } else if (rank === 'master' || rank === 'officer') {
-      body = `<h3>${esc(RANK[rank])} 권한으로 로그인했습니다</h3><p><b>${esc(name)}</b>님은 호드평화유지단입니다. 가입 승인과 등급 관리 화면은 다음 단계에서 열립니다.</p>`;
+      body = `<h3>${esc(RANK[rank])} 권한으로 로그인했습니다</h3><p><b>${esc(name)}</b>님은 호드평화유지단입니다. 아래의 <b>가입 승인 · 등급 관리</b>에서 길드원을 승인하고 등급을 정할 수 있습니다.</p>`;
     } else {
-      body = `<h3>환영합니다, ${esc(name)}님</h3><p>등급: <b>${esc(RANK[rank] || rank)}</b>. 캐릭터 등록과 레이드 신청 기능은 단계적으로 열립니다.</p>`;
+      body = `<h3>환영합니다, ${esc(name)}님</h3><p>등급: <b>${esc(RANK[rank] || rank)}</b>. 아래 <b>내 캐릭터</b>에서 캐릭터를 등록하세요. 레이드 신청 기능은 곧 열립니다.</p>`;
     }
     card.innerHTML = `<div class="placeholder ${rank === 'pending' ? '' : 'ok'}"><div class="ph-icon">${rank === 'pending' ? '⏳' : '✅'}</div>${body}<span class="ph-tag">${esc(RANK[rank] || rank)}</span></div>`;
   }

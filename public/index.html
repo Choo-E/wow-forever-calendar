@@ -2,8 +2,17 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WoW Forever 캘린더</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>오늘도 평화로운 호드 생활 · 길드 캘린더</title>
+  <meta name="description" content="WoW 포에버 길드 일정 · 레이드 · 공지 (비공식 팬 사이트)">
+  <meta name="theme-color" content="#0a0c11">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/icon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="호드생활">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Noto+Serif+KR:wght@500;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,47 +22,174 @@
   <header class="top">
     <div class="brand">
       <img class="brand-logo" src="img/forever-logo.png" alt="World of Warcraft: Forever" width="441" height="359">
-      <span class="brand-sub">일정 · 패치 · 이벤트 캘린더</span>
+      <span class="brand-sub" id="brandSub">오늘도 평화로운 호드 생활 · 길드 캘린더</span>
     </div>
     <div class="status">
       <span id="updated" class="updated">불러오는 중…</span>
+      <button id="installBtn" class="btn" type="button" hidden>📲 앱으로 설치</button>
       <button id="refresh" class="btn" type="button">지금 새로고침</button>
     </div>
   </header>
+  <div id="iosHint" class="ios-hint" hidden>
+    <b>아이폰에서 앱처럼 설치하는 방법</b><br>
+    사파리에서 이 페이지를 열고 아래의 <b>공유 버튼(□↑)</b> → <b>홈 화면에 추가</b>를 누르세요.
+    <button id="iosHintClose" class="btn" type="button">닫기</button>
+  </div>
+
+  <!-- 데스크톱: 위쪽 탭 메뉴 -->
+  <nav class="tabs" aria-label="메뉴">
+    <div class="tabs-inner">
+      <a href="#/home" data-tab="home">🏠 홈</a>
+      <a href="#/notice" data-tab="notice">📢 공지</a>
+      <a href="#/schedule" data-tab="schedule">📅 일정</a>
+      <a href="#/raid" data-tab="raid">⚔️ 레이드</a>
+      <a href="#/event" data-tab="event">🎉 이벤트</a>
+      <a href="#/member" data-tab="member">👥 멤버</a>
+      <a href="#/minutes" data-tab="minutes">🔒 회의록</a>
+      <a href="#/news" data-tab="news">📰 소식</a>
+    </div>
+  </nav>
 
   <main>
-    <section id="hero" class="hero" aria-live="polite"></section>
-
-    <section id="live" class="live" aria-live="polite"></section>
-
-    <section class="block">
-      <h2 class="block-title"><span>다가오는 일정</span></h2>
-      <div id="upcoming" class="upcoming"></div>
+    <!-- 홈 -->
+    <section class="panel" data-panel="home">
+      <div id="homeNotices"></div>
+      <section id="hero" class="hero" aria-live="polite"></section>
+      <section id="live" class="live" aria-live="polite"></section>
+      <section class="block">
+        <h2 class="block-title"><span>우리 길드 현황</span></h2>
+        <div id="homeCards" class="home-grid"></div>
+      </section>
+      <section class="block">
+        <h2 class="block-title"><span>다가오는 일정</span></h2>
+        <div id="upcoming" class="upcoming"></div>
+      </section>
     </section>
 
-    <section class="block">
-      <h2 class="block-title"><span>월간 달력</span></h2>
-      <div id="calendar" class="calendar"></div>
+    <!-- 공지 -->
+    <section class="panel" data-panel="notice" hidden>
+      <header class="page-head"><h1>공지</h1><p>길드 소식과 안내를 모아 봅니다.</p></header>
+      <section class="block">
+        <h2 class="block-title"><span>전체 공개 공지</span></h2>
+        <div id="noticeList"></div>
+      </section>
+      <section class="block">
+        <h2 class="block-title"><span>길드원 · 호드평화유지단 전용</span></h2>
+        <div class="placeholder">
+          <div class="ph-icon">🔒</div>
+          <h3>로그인 후 볼 수 있는 공지</h3>
+          <p>길드원 전용 공지와 호드평화유지단(길드 관리자) 전용 공지는 <b>디스코드 로그인</b>이 도입된 뒤에 열립니다.</p>
+          <span class="ph-tag">준비 중</span>
+        </div>
+      </section>
     </section>
 
-    <section class="block guild" id="guildSection" hidden>
-      <h2 class="block-title"><span id="guildTitle">길드 일정</span></h2>
-      <div id="guildNotices"></div>
-      <div id="guildUpcoming" class="guild-list"></div>
-      <details id="guildPast" class="guild-past">
-        <summary>지난 일정 <span id="guildPastCount"></span></summary>
-        <div id="guildPastList" class="guild-list"></div>
-      </details>
+    <!-- 일정 -->
+    <section class="panel" data-panel="schedule" hidden>
+      <header class="page-head"><h1>일정</h1><p>공식 일정, 패치, 길드 일정을 한 달력에서 봅니다. 날짜를 누르면 그날 소식을 모아 봅니다.</p></header>
+      <section class="block">
+        <h2 class="block-title"><span>월간 달력</span></h2>
+        <div id="calendar" class="calendar"></div>
+      </section>
+      <section class="block guild" id="guildSection" hidden>
+        <h2 class="block-title"><span id="guildTitle">길드 일정</span></h2>
+        <div id="guildUpcoming" class="guild-list"></div>
+        <details id="guildPast" class="guild-past">
+          <summary>지난 일정 <span id="guildPastCount"></span></summary>
+          <div id="guildPastList" class="guild-list"></div>
+        </details>
+      </section>
     </section>
 
-    <section class="block" id="timeline">
-      <h2 class="block-title"><span>소식 타임라인</span></h2>
-      <div id="dayNotice"></div>
-      <div class="filters" role="toolbar" aria-label="필터">
-        <div id="catFilters" class="chips"></div>
-        <div id="srcFilters" class="chips"></div>
+    <!-- 레이드 -->
+    <section class="panel" data-panel="raid" hidden>
+      <header class="page-head"><h1>레이드</h1><p>정기 레이드 일정과 신청 안내입니다.</p></header>
+      <div class="banner">🚧 <b>신청 기능은 준비 중입니다.</b> 디스코드 로그인이 도입된 뒤 이 화면에서 직접 신청할 수 있게 됩니다. 지금은 일정과 규칙만 보여 줍니다.</div>
+      <section class="block">
+        <h2 class="block-title"><span id="raidTitle">정기 레이드</span></h2>
+        <div id="raidList" class="guild-list"></div>
+      </section>
+      <section class="block">
+        <h2 class="block-title"><span>신청 방식 (예정)</span></h2>
+        <div class="steps">
+          <div class="step"><span class="n">1</span><div><h3>신청 오픈</h3><p>매주 <b>목요일 21:00</b>(한국 시간)에 그 주말 레이드 신청이 열립니다.</p></div></div>
+          <div class="step"><span class="n">2</span><div><h3>역할별 선착순</h3><p>탱·힐·딜 <b>역할별 정원</b> 안에서 신청 순서대로 확정되고, 넘치면 대기가 됩니다. 정원은 레이드마다 정합니다.</p></div></div>
+          <div class="step"><span class="n">3</span><div><h3>공대장 확정</h3><p>길마 또는 공대장이 신청자 중에서 <b>최종 참석자</b>를 확정합니다.</p></div></div>
+          <div class="step"><span class="n">4</span><div><h3>디스코드 알림</h3><p>확정되면 디스코드에 공대 명단이 올라오고, 하루 전과 시작 전에 알림이 갑니다.</p></div></div>
+        </div>
+        <div class="rules">
+          <h3>신청 규칙 (시험 운영 · 바뀔 수 있음)</h3>
+          <ul>
+            <li>신입 포함 모든 길드원이 신청할 수 있습니다.</li>
+            <li>한 사람은 같은 레이드에 <b>캐릭터 1개만</b> 신청할 수 있습니다. (토요일·일요일은 별개의 레이드입니다.)</li>
+            <li>레이드 시작 전까지 취소할 수 있습니다. 시작 3시간 이내 취소는 "늦은 취소"로 공대장에게만 표시됩니다.</li>
+            <li>신청 마감 시각은 정해지는 대로 안내합니다.</li>
+          </ul>
+        </div>
+      </section>
+    </section>
+
+    <!-- 이벤트 -->
+    <section class="panel" data-panel="event" hidden>
+      <header class="page-head"><h1>이벤트</h1><p>길드 모임, 행사, 기념일입니다.</p></header>
+      <div class="banner">🚧 이벤트 <b>참가 신청</b>은 준비 중입니다. 지금은 일정만 보여 줍니다.</div>
+      <section class="block">
+        <h2 class="block-title"><span>예정 · 진행 중</span></h2>
+        <div id="eventUpcoming" class="guild-list"></div>
+        <details id="eventPast" class="guild-past">
+          <summary>지난 이벤트 <span id="eventPastCount"></span></summary>
+          <div id="eventPastList" class="guild-list"></div>
+        </details>
+      </section>
+    </section>
+
+    <!-- 멤버 -->
+    <section class="panel" data-panel="member" hidden>
+      <header class="page-head"><h1>멤버</h1><p>길드원 명단입니다.</p></header>
+      <div class="placeholder">
+        <div class="ph-icon">👥</div>
+        <h3>멤버 명단은 준비 중입니다</h3>
+        <p>길드원이 직접 캐릭터를 등록하면 명단이 만들어집니다. 명단에는 <b>캐릭터 이름 · 직업 · 역할 · 등급</b>만 보이고, 디스코드 계정 같은 정보는 공개되지 않습니다.</p>
+        <p>처음에는 모두에게 공개하고, 나중에 <b>"길드원만 보기"</b>로 바꿀 수 있게 만들 예정입니다.</p>
+        <span class="ph-tag">준비 중 · 로그인 도입 후 열림</span>
       </div>
-      <div id="feed" class="feed"></div>
+      <div class="table-wrap" aria-hidden="true">
+        <table class="ph-table">
+          <thead><tr><th>캐릭터</th><th>직업</th><th>역할</th><th>등급</th></tr></thead>
+          <tbody><tr><td colspan="4">아직 등록된 멤버가 없습니다</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 회의록 -->
+    <section class="panel" data-panel="minutes" hidden>
+      <header class="page-head"><h1>회의록</h1><p>호드평화유지단(길드 관리자) 전용 공간입니다.</p></header>
+      <div class="placeholder lock">
+        <div class="ph-icon">🔒</div>
+        <h3>호드평화유지단 전용</h3>
+        <p><b>호드평화유지 N차 정기 총회</b> 같은 회의록은 호드평화유지단으로 로그인한 사람만 볼 수 있습니다. 로그인 기능이 도입되기 전까지는 열리지 않습니다.</p>
+        <p class="warn">이 화면에는 어떤 회의 내용도 저장되거나 표시되지 않습니다. 회의록은 공개 사이트에 올리지 않고, 로그인과 권한 확인이 있는 별도의 저장소에만 보관할 예정입니다.</p>
+        <span class="ph-tag">준비 중</span>
+      </div>
+      <section class="block">
+        <h2 class="block-title"><span>회의록에 담을 내용 (예정)</span></h2>
+        <div class="chips-static">
+          <span>회의 이름 · 차수</span><span>일시 · 장소</span><span>참석 · 불참</span><span>주요 안건</span><span>결정 사항</span><span>후속 조치(담당·기한)</span><span>다음 회의 일정</span><span>길드원 공개 요약</span>
+        </div>
+      </section>
+    </section>
+
+    <!-- 소식 -->
+    <section class="panel" data-panel="news" hidden>
+      <header class="page-head"><h1>소식</h1><p>포에버와 모든 와우에 공통인 소식을 한글로 모아 봅니다.</p></header>
+      <section class="block" id="timeline">
+        <div id="dayNotice"></div>
+        <div class="filters" role="toolbar" aria-label="필터">
+          <div id="catFilters" class="chips"></div>
+          <div id="srcFilters" class="chips"></div>
+        </div>
+        <div id="feed" class="feed"></div>
+      </section>
     </section>
   </main>
 
@@ -63,6 +199,21 @@
     <p><b>일정 정보</b>: 상단의 주요 일정은 블리자드 공식 공지를 사람이 직접 확인해 정리한 것으로, 2026년 11월 1일 기준입니다. 일정은 바뀔 수 있으니 각 카드의 공식 링크에서 꼭 다시 확인해 주세요. 한국 시간(KST) 기준입니다.</p>
     <p><b>소식 목록</b>: Wowhead의 공개 RSS에서 <b>포에버 소식과 모든 와우에 공통인 소식만</b> 골라(본섭·본섭 테스트 서버 소식은 제외) 제목·요약·링크만 가져오며, 모든 기사의 저작권은 각 출처에 있습니다. 영어 제목과 요약은 기계가 자동으로 번역한 것이라 <b>부정확할 수 있으니</b>, 카드에 작게 적힌 원문과 원문 사이트(카드를 누르면 이동)를 함께 확인해 주세요.</p>
   </footer>
+
+  <!-- 모바일: 아래쪽 앱 메뉴 -->
+  <div id="moreSheet" class="more-sheet" hidden>
+    <a href="#/event" data-tab="event">🎉 이벤트</a>
+    <a href="#/member" data-tab="member">👥 멤버</a>
+    <a href="#/minutes" data-tab="minutes">🔒 회의록</a>
+    <a href="#/news" data-tab="news">📰 소식</a>
+  </div>
+  <nav class="bottom-nav" aria-label="앱 메뉴">
+    <a href="#/home" data-tab="home"><span class="ic">🏠</span>홈</a>
+    <a href="#/schedule" data-tab="schedule"><span class="ic">📅</span>일정</a>
+    <a href="#/raid" data-tab="raid"><span class="ic">⚔️</span>레이드</a>
+    <a href="#/notice" data-tab="notice"><span class="ic">📢</span>공지</a>
+    <button type="button" id="moreBtn" aria-expanded="false" aria-controls="moreSheet"><span class="ic">☰</span>더보기</button>
+  </nav>
 
   <script src="app.js"></script>
 </body>

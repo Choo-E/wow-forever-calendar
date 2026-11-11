@@ -282,7 +282,7 @@ $('calendar').addEventListener('click', (e) => {
   filter.day = filter.day === cell.dataset.day ? null : cell.dataset.day;
   renderCalendar();
   renderFeed();
-  if (filter.day) $('timeline').scrollIntoView({ behavior: 'smooth' });
+  if (filter.day) location.hash = '#/news'; // 고른 날짜의 소식은 소식 탭에서 보여 준다
 });
 
 // ───── 길드 일정 (예정·진행 중 / 지난 일정) ─────
@@ -321,36 +321,36 @@ function guildItem(e, today) {
   </div>`;
 }
 
+// 예정·진행 중 목록과 접이식 "지난 일정"을 지정한 요소들에 그린다. (일정 탭과 이벤트 탭이 같이 쓴다)
+function paintGuildLists(ids, upcoming, past, today) {
+  $(ids.up).innerHTML = upcoming.length
+    ? upcoming.map((e) => guildItem(e, today)).join('')
+    : '<div class="empty">예정된 길드 일정이 없습니다.</div>';
+  const pastBox = $(ids.pastBox);
+  pastBox.hidden = !past.length;
+  $(ids.count).textContent = `(${past.length}건)`;
+  $(ids.list).innerHTML = past.map((e) => guildItem(e, today)).join('');
+  pastBox.open = !upcoming.length && past.length > 0;
+}
+
 function renderGuild() {
   const g = data.guild || {};
   const events = expandYearly(g.events || [], Number(kstDay(Date.now()).slice(0, 4)) + 1);
-  const notices = g.notices || [];
-  const section = $('guildSection');
-  if (!events.length && !notices.length) {
-    section.hidden = true;
-    return;
-  }
-  section.hidden = false;
-  $('guildTitle').textContent = g.name ? `${g.name} · 길드 일정` : '길드 일정';
-
-  $('guildNotices').innerHTML = notices.length
-    ? `<ul class="guild-notices">${notices.map((n) => `<li>${esc(typeof n === 'string' ? n : n.text)}</li>`).join('')}</ul>`
-    : '';
-
   const today = dayNum(kstDay(Date.now()));
   const sortedAsc = [...events].sort((a, b) => dayNum(a.date) - dayNum(b.date));
   const upcoming = sortedAsc.filter((e) => dayNum(e.endDate || e.date) >= today);
   const past = sortedAsc.filter((e) => dayNum(e.endDate || e.date) < today).reverse();
 
-  $('guildUpcoming').innerHTML = upcoming.length
-    ? upcoming.map((e) => guildItem(e, today)).join('')
-    : '<div class="empty">예정된 길드 일정이 없습니다.</div>';
+  paintGuildLists({ up: 'eventUpcoming', pastBox: 'eventPast', count: 'eventPastCount', list: 'eventPastList' }, upcoming, past, today);
 
-  const pastBox = $('guildPast');
-  pastBox.hidden = !past.length;
-  $('guildPastCount').textContent = `(${past.length}건)`;
-  $('guildPastList').innerHTML = past.map((e) => guildItem(e, today)).join('');
-  pastBox.open = !upcoming.length && past.length > 0;
+  const section = $('guildSection');
+  if (!events.length) {
+    section.hidden = true;
+    return;
+  }
+  section.hidden = false;
+  $('guildTitle').textContent = g.name ? `${g.name} · 길드 일정` : '길드 일정';
+  paintGuildLists({ up: 'guildUpcoming', pastBox: 'guildPast', count: 'guildPastCount', list: 'guildPastList' }, upcoming, past, today);
 }
 
 // ───── 타임라인 ─────
@@ -430,6 +430,189 @@ function card(i) {
   </a>`;
 }
 
+// ───── 탭 이동 (주소 끝의 #/탭이름 으로 구분) ─────
+const TABS = { home: '홈', notice: '공지', schedule: '일정', raid: '레이드', event: '이벤트', member: '멤버', minutes: '회의록', news: '소식' };
+const MORE_TABS = ['event', 'member', 'minutes', 'news']; // 모바일에서 "더보기" 안에 들어가는 탭
+
+function closeMore() {
+  $('moreSheet').hidden = true;
+  $('moreBtn').setAttribute('aria-expanded', 'false');
+}
+
+function showTab() {
+  const raw = location.hash.replace(/^#\/?/, '');
+  const tab = TABS[raw] ? raw : 'home';
+  document.querySelectorAll('.panel').forEach((p) => {
+    p.hidden = p.dataset.panel !== tab;
+  });
+  document.querySelectorAll('[data-tab]').forEach((a) => {
+    if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  });
+  $('moreBtn').classList.toggle('active', MORE_TABS.includes(tab));
+  closeMore();
+  document.title = tab === 'home' ? '오늘도 평화로운 호드 생활 · 길드 캘린더' : `${TABS[tab]} · 오늘도 평화로운 호드 생활`;
+  window.scrollTo(0, 0);
+}
+
+$('moreBtn').addEventListener('click', () => {
+  const open = $('moreSheet').hidden;
+  $('moreSheet').hidden = !open;
+  $('moreBtn').setAttribute('aria-expanded', String(open));
+});
+document.addEventListener('click', (e) => {
+  if (!$('moreSheet').hidden && !e.target.closest('#moreSheet, #moreBtn')) closeMore();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMore();
+});
+
+// ───── 정기 레이드 (보기 전용: 신청 기능은 로그인 도입 후) ─────
+const WD = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+const toMin = (hhmm) => {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+};
+// 지금 한국 시각: 오늘 날짜 번호와 자정부터 지난 분
+function kstClock() {
+  const hm = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
+  const get = (t) => Number(hm.find((x) => x.type === t).value);
+  return { day: dayNum(kstDay(Date.now())), min: get('hour') * 60 + get('minute') };
+}
+// 날짜 번호 → "11/14(토)"
+const mdw = (day) => {
+  const p = parts(ymdOf(day));
+  return `${p.m}/${p.d}(${p.w})`;
+};
+function fmtLeft(mins) {
+  if (mins >= 1440) return `${Math.floor(mins / 1440)}일 ${Math.floor((mins % 1440) / 60)}시간`;
+  return `${Math.floor(mins / 60)}시간 ${mins % 60}분`;
+}
+// 정기 레이드의 다음 시작 날짜 (이미 오늘 시작 시각이 지났으면 다음 주)
+function nextRaid(t) {
+  const now = kstClock();
+  for (let i = 0; i < 8; i++) {
+    const day = now.day + i;
+    if (new Date(day * 86400000).getUTCDay() === WD[t.weekday] && (i > 0 || now.min < toMin(t.time))) return { day };
+  }
+  return null;
+}
+const raidInfo = () => (data.guild?.raids?.templates?.length ? data.guild.raids : null);
+
+function renderRaids() {
+  const r = raidInfo();
+  const list = $('raidList');
+  if (!r) {
+    list.innerHTML = '<div class="empty">등록된 정기 레이드가 없습니다.</div>';
+    return;
+  }
+  $('raidTitle').textContent = r.status ? `정기 레이드 (${r.status})` : '정기 레이드';
+  const now = kstClock();
+  list.innerHTML = r.templates
+    .map((t) => {
+      const nx = nextRaid(t);
+      if (!nx) return '';
+      const p = parts(ymdOf(nx.day));
+      const diff = nx.day - now.day;
+      const detail = [`${esc(t.time)} 시작`, t.dungeon ? esc(t.dungeon) : '던전 미정', t.size ? `${t.size}인` : '정원 미정', t.leader ? `공대장 ${esc(t.leader)}` : '공대장 미정'].join(' · ');
+
+      let open = '';
+      if (r.signupOpens) {
+        const back = (WD[t.weekday] - WD[r.signupOpens.weekday] + 7) % 7;
+        const openDay = nx.day - back;
+        const left = (openDay - now.day) * 1440 + toMin(r.signupOpens.time) - now.min;
+        open = left > 0
+          ? `신청 오픈 <b>${mdw(openDay)} ${esc(r.signupOpens.time)}</b> · 오픈까지 ${fmtLeft(left)}`
+          : `신청 오픈 시각(${mdw(openDay)} ${esc(r.signupOpens.time)})이 지났습니다 · 신청 기능은 준비 중`;
+      }
+      return `<div class="guild-item cat-raid ${diff === 0 ? 'live' : 'soon'}">
+        <div class="event-date"><span class="m">${p.m}월</span><span class="d">${p.d}</span><span class="m">${p.w}요일</span></div>
+        <div class="guild-info">
+          <h3>${esc(t.name)}</h3>
+          <p>${detail}</p>
+          ${open ? `<p class="raid-open">${open}</p>` : ''}
+          <button class="btn" type="button" disabled>신청하기 (준비 중)</button>
+        </div>
+        <span class="guild-status">${diff === 0 ? '오늘' : `D-${diff}`}</span>
+      </div>`;
+    })
+    .join('');
+}
+
+// ───── 홈 카드 · 공지 · 머리글 ─────
+function renderHomeCards() {
+  const cards = [];
+  const now = kstClock();
+
+  const r = raidInfo();
+  if (r) {
+    const next = r.templates
+      .map((t) => ({ t, n: nextRaid(t) }))
+      .filter((x) => x.n)
+      .sort((a, b) => a.n.day - b.n.day)[0];
+    if (next) {
+      const diff = next.n.day - now.day;
+      cards.push({ href: '#/raid', label: '⚔️ 다음 레이드', main: `${mdw(next.n.day)} ${next.t.time}`, sub: `${next.t.name} · ${diff === 0 ? '오늘' : `D-${diff}`}` });
+    }
+  }
+
+  const events = expandYearly(data.guild?.events || [], Number(kstDay(Date.now()).slice(0, 4)) + 1)
+    .filter((e) => dayNum(e.endDate || e.date) >= now.day)
+    .sort((a, b) => dayNum(a.date) - dayNum(b.date));
+  if (events[0]) {
+    const e = events[0];
+    const start = dayNum(e.date);
+    cards.push({ href: '#/schedule', label: '🎉 길드 다음 일정', main: e.title, sub: `${mdw(start)}${e.endDate ? ` ~ ${mdw(dayNum(e.endDate))}` : ''} · ${start <= now.day ? '진행 중' : `D-${start - now.day}`}` });
+  }
+
+  const latest = data.items[0];
+  if (latest) cards.push({ href: '#/news', label: '📰 최신 소식', main: latest.titleKo || latest.title, sub: ago(latest.date) });
+
+  $('homeCards').innerHTML = cards
+    .map((c) => `<a class="home-card" href="${c.href}"><span class="hc-label">${c.label}</span><strong class="hc-main">${esc(c.main)}</strong><span class="hc-sub">${esc(c.sub)}</span></a>`)
+    .join('');
+}
+
+function renderNotices() {
+  const notices = (data.guild?.notices || []).map((n) => (typeof n === 'string' ? { text: n } : n)).filter((n) => n.text);
+  $('homeNotices').innerHTML = notices.slice(0, 3).map((n) => `<a class="notice-banner" href="#/notice">📢 ${esc(n.text)}</a>`).join('');
+  $('noticeList').innerHTML = notices.length
+    ? `<ul class="guild-notices">${notices.map((n) => `<li>${esc(n.text)}</li>`).join('')}</ul>`
+    : '<div class="empty">지금 올라온 공개 공지가 없습니다.</div>';
+}
+
+function renderBrand() {
+  const name = data.guild?.name;
+  $('brandSub').textContent = name ? `${name} · 길드 캘린더` : '길드 캘린더';
+}
+
+// ───── 폰에 앱처럼 설치하기 ─────
+let installPrompt = null;
+const isStandalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installPrompt = e;
+  if (!isStandalone) $('installBtn').hidden = false;
+});
+if (isIOS && !isStandalone) $('installBtn').hidden = false; // 아이폰은 자동 설치 창이 없어서 안내 문구를 보여 준다
+$('installBtn').addEventListener('click', async () => {
+  if (installPrompt) {
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    $('installBtn').hidden = true;
+  } else if (isIOS) {
+    $('iosHint').hidden = false;
+  }
+});
+$('iosHintClose').addEventListener('click', () => {
+  $('iosHint').hidden = true;
+});
+window.addEventListener('appinstalled', () => {
+  $('installBtn').hidden = true;
+});
+
 // ───── 하단/상태 ─────
 function renderStatus() {
   $('updated').textContent = data.updatedAt ? `마지막 업데이트: ${ago(data.updatedAt)}` : '아직 데이터를 받지 못했습니다';
@@ -442,11 +625,15 @@ function renderStatus() {
 }
 
 function renderAll() {
+  renderBrand();
+  renderNotices();
   renderHero();
   renderLive();
+  renderHomeCards();
   renderUpcoming();
   renderCalendar();
   renderGuild();
+  renderRaids();
   renderFilters();
   renderFeed();
   renderStatus();
@@ -469,5 +656,14 @@ async function load() {
 }
 
 $('refresh').addEventListener('click', () => load());
+window.addEventListener('hashchange', showTab);
+showTab();
 load();
 setInterval(() => load(), 5 * 60 * 1000);
+
+// 폰 설치형 앱(PWA): 서비스 워커를 등록한다. 실패해도 사이트는 그대로 동작한다.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}

@@ -10,7 +10,10 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - `src/sources/` — 출처별 수집기 (`wowhead.js`: RSS, `blizzard.js`: 뉴스 페이지 파싱 — **공개판에서는 꺼짐**, `ENABLE_BLIZZARD=1`일 때만 사용)
 - `src/classify.js` — 제목 키워드로 패치/이벤트/소식 및 Forever 여부 분류
 - `data/schedule.json` — 손으로 관리하는 주요 일정 (출시일 등). 날짜 단위, 한국 시간 기준
-- `public/` — 화면 (index.html, style.css, app.js)
+- `public/` — 화면 (index.html, style.css, app.js). **길드 앱 구조: 8개 탭** (홈·공지·일정·레이드·이벤트·멤버·회의록·소식). 주소 끝의 `#/탭이름`으로 전환(`showTab`). 데스크톱은 위쪽 탭 메뉴, 모바일(≤680px)은 아래쪽 앱 메뉴(5개 + "더보기")
+- 폰 설치형 앱(PWA): `public/manifest.webmanifest`, `public/sw.js`(네트워크 우선·오프라인 대비 캐시), `public/icons/`(자체 제작 엠블럼 "平" 방패). 안드로이드는 "앱 설치" 버튼, 아이폰은 "홈 화면에 추가" 안내가 헤더에 나옴
+- 멤버·회의록 탭과 레이드 신청은 **빈 틀(준비 중)**. 로그인·데이터베이스가 없으면 만들 수 없는 기능이다. 회의록·멤버 개인정보는 **절대 이 공개 저장소·공개 화면에 넣지 않는다**
+- 기획·진행 상황: `docs/guild-app-draft.md` (10장이 최신 확정안)
 
 ## schedule.json 항목 형식
 - `date`(시작일) / `endDate`(종료일, 기간 일정일 때만) / `dateText`(날짜 미정일 때 표시할 문구, date는 null)
@@ -21,7 +24,8 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - 길드: 오늘도 평화로운 호드 생활 (호드). 사용자가 대화로 알려주는 일정을 `data/guild.json`의 `events`에 추가한다
 - 항목: `title`, `date`, `endDate`(기간일 때), `time`(선택, 예 "21:00"), `note`(선택). 날짜는 한국 시간 기준
 - 매년 반복 일정: `"repeat": "yearly"` (예: 길드 창립 기념일 11/5). `date`의 연도부터 내년까지 자동으로 펼침. 선택 항목 `since`(창립 연도)를 넣으면 제목에 "(N주년)"이 붙음. 펼치는 규칙은 `public/app.js`와 `scripts/post-discord.js`의 `expandYearly` 두 곳에 같은 코드로 있으니 한쪽을 고치면 다른 쪽도 고칠 것
-- `notices`: 사이트에 띄울 공지 문구 배열 (없으면 비워 둠)
+- `raids`: 정기 레이드 템플릿(보기 전용). `signupOpens`(신청 오픈 요일·시간, 현재 목요일 21:00), `templates[]`(`weekday`: sun~sat, `time`, `dungeon`/`size`/`leader`는 미정이면 null). 레이드 탭이 "다음 시작 시각"과 "신청 오픈까지 남은 시간"을 한국 시간으로 계산해 보여 줌. 공대장 이름 등 개인 정보는 공개 파일이므로 신중히
+- `notices`: 사이트에 띄울 **전체 공개** 공지 문구 배열 (없으면 비워 둠). 홈 상단 배너와 공지 탭에 표시
 - 달력에는 청록색(`cat-guild`)으로 표시, 달력 아래 "길드 일정" 영역에 예정·진행 중과 접이식 "지난 일정"으로 자동 분류됨
 - 공개 사이트이므로 멤버 이름, 디스코드 초대 링크 등 민감한 정보는 넣지 않는다
 

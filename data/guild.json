@@ -2,6 +2,14 @@
   "name": "오늘도 평화로운 호드 생활",
   "faction": "호드",
   "notices": [],
+  "raids": {
+    "status": "시험 운영",
+    "signupOpens": { "weekday": "thu", "time": "21:00" },
+    "templates": [
+      { "id": "raid-sat-1800", "name": "정기 레이드 · 토요일", "weekday": "sat", "time": "18:00", "dungeon": null, "size": null, "leader": null },
+      { "id": "raid-sun-1800", "name": "정기 레이드 · 일요일", "weekday": "sun", "time": "18:00", "dungeon": null, "size": null, "leader": null }
+    ]
+  },
   "events": [
     {
       "id": "guild-launch-week",

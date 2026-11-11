@@ -14,6 +14,7 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - 폰 설치형 앱(PWA): `public/manifest.webmanifest`, `public/sw.js`(네트워크 우선·오프라인 대비 캐시), `public/icons/`(자체 제작 엠블럼 "平" 방패). 안드로이드는 "앱 설치" 버튼, 아이폰은 "홈 화면에 추가" 안내가 헤더에 나옴
 - 멤버·회의록 탭과 레이드 신청은 **빈 틀(준비 중)**. 로그인·데이터베이스가 없으면 만들 수 없는 기능이다. 회의록·멤버 개인정보는 **절대 이 공개 저장소·공개 화면에 넣지 않는다**
 - 기획·진행 상황: `docs/guild-app-draft.md` (10장이 최신 확정안)
+- **2단계(로그인·DB) 준비물**: `supabase/schema.sql`(표·접근 규칙(RLS)·함수, 아직 실행 전), `docs/stage2-setup.md`(사용자가 직접 할 일: Supabase·디스코드 앱 가입). 가입은 **승인제**(처음엔 pending). 공개 명단은 표를 직접 열지 않고 `get_roster()` 함수로만 노출. **Supabase 공개용 키(Project URL, publishable/anon key)만 코드에 둘 수 있고, secret/service_role 키·DB 비밀번호·Discord Client Secret은 절대 저장소·대화에 두지 않는다**
 
 ## schedule.json 항목 형식
 - `date`(시작일) / `endDate`(종료일, 기간 일정일 때만) / `dateText`(날짜 미정일 때 표시할 문구, date는 null)

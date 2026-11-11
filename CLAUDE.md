@@ -67,3 +67,11 @@ WoW: Forever 관련 일정·패치·이벤트를 모아 보여주는 웹앱. 사
 - `public/auth.js`: 디스코드 로그인, 헤더 로그인 버튼, 내 계정 카드. 로그인 상태가 바뀌면 `hl-auth` 이벤트와 `window.hlAuthState`로 알림
 - `public/members.js`: 내 캐릭터 등록·삭제, 가입 승인·등급 관리(간부·길마), 공개 명단(`get_roster` 함수), 명단 공개 스위치(길마). 권한은 화면이 아니라 DB 규칙(RLS)이 최종으로 지킨다
 - 데이터베이스 설계는 `supabase/schema.sql`. 바꿨으면 Supabase SQL Editor에서 다시 실행해야 반영된다
+
+## 레이드 신청 (3단계)
+- `supabase/stage3-raids.sql`: 템플릿(`raid_templates`)·레이드(`raids`)·신청(`raid_signups`) 표와 함수. **신청 표는 직접 읽기·쓰기 불가, 반드시 함수로만** (`signup_raid`, `cancel_signup`, `set_signup_status`, `update_raid`, `save_template`, `get_raids`, `get_raid_signups`, `ensure_raids`). 바꿨으면 Supabase SQL Editor에서 다시 실행(여러 번 실행해도 안전)
+- 선착순: `signup_raid`가 레이드 한 줄을 `for update`로 잠그고 역할별 정원을 센다. 정원이 null이면 제한 없음, 가득 차면 대기. 취소하면 같은 역할 대기 1순위가 자동 승급, 시작 3시간 이내 취소는 `late_cancel`로 공대장에게만 표시
+- 레이드는 `ensure_raids`가 앞으로 14일치를 템플릿에서 자동 생성(신청 오픈 = 레이드 직전의 오픈 요일·시각, 기본 목요일 21:00 KST). 템플릿을 저장하면 앞으로 열릴 레이드에도 던전·정원·공대장·마감이 반영된다(이미 정해진 오픈 시각은 그대로)
+- 화면: `public/raids.js` (신청·취소·신청자 목록·공대장 확정·레이드별/템플릿 설정). 20초마다 자동 새로고침(입력 중에는 제외)
+- 시험할 때 신청을 지금 열려면 SQL로 `signup_opens_at`을 앞당기고, 끝나면 반드시 원래대로 되돌린다
+- 미시험: 여러 사람의 동시 신청·대기 승급(부계정 필요), "늦은 취소" 표시, 공대장 계급 사용자의 관리

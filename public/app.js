@@ -315,7 +315,7 @@ function guildItem(e, today) {
     <div class="event-date">${dateBox}</div>
     <div class="guild-info">
       <h3>${esc(e.title)}</h3>
-      <p>${range}${e.note ? ` · ${esc(e.note)}` : ''}</p>
+      <p>${range}${e.note ? ` · ${esc(e.note)}` : ''}${/^https:\/\//.test(e.url || '') ? ` · <a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ''}</p>
     </div>
     <span class="guild-status">${status}</span>
   </div>`;

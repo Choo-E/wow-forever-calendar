@@ -89,7 +89,7 @@ function buildBoard(schedule, guild, today) {
   fields.push({
     name: `⚔️ 길드 일정`,
     value: guildEvents.length
-      ? trunc(guildEvents.slice(0, 8).map((e) => `**${span(e)}** ${e.time ? `${e.time} ` : ''}${e.title} — ${dLabel(e)}${e.note ? `\n> ${e.note}` : ''}`).join('\n'))
+      ? trunc(guildEvents.slice(0, 8).map((e) => `**${span(e)}** ${e.time ? `${e.time} ` : ''}${e.title} — ${dLabel(e)}${e.note ? `\n> ${e.note}` : ''}${e.url ? `\n> [공식 안내 보기](${e.url})` : ''}`).join('\n'))
       : '예정된 길드 일정이 없습니다.',
   });
 
@@ -187,7 +187,7 @@ if (newPatches.length) {
 }
 
 if (newEvents.length) {
-  const lines = newEvents.map((e) => `• **${when(e)}** ${e.time ? `${e.time} ` : ''}${e.title}${e.note ? ` (${e.note})` : ''}`);
+  const lines = newEvents.map((e) => `• **${when(e)}** ${e.time ? `${e.time} ` : ''}${e.title}${e.note ? ` (${e.note})` : ''}${e.url ? `\n  🔗 ${e.url}` : ''}`);
   await call('POST', WEBHOOK, {
     allowed_mentions: { parse: [] },
     content: `📢 **새 길드 일정이 등록되었습니다**\n${lines.join('\n')}\n\n${LINK}`,
